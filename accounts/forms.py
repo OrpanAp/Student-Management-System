@@ -52,30 +52,34 @@ class StudentUpdateClassAssignForm(forms.ModelForm):
         )
         
 class StudentAddResult(forms.ModelForm):
-    user = forms.ModelChoiceField(
-        queryset=models.User.objects.filter(role="Student"), label="Student"
-    )
-    
     class Meta:
         model = models.StudentResult
-        fields = (
-            'user',
-            'subject',
-            'semester',
-            'year',
-            'cgpa',
-        )
+        fields = '__all__'
 
+    def clean(self):
+        cleaned_data = super().clean()
+        user = cleaned_data.get('user')
+        year = cleaned_data.get('year')
+        semester = cleaned_data.get('semester')
+        subject = cleaned_data.get('subject')
+
+        if models.StudentResult.objects.filter(
+            user=user,
+            year=year,
+            semester=semester,
+            subject=subject
+        ).exists():
+            raise forms.ValidationError(
+                "This subject already exists for this student in this semester and year."
+            )
+
+        return cleaned_data
+    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Get users who already have results
-        existing_users = models.StudentResult.objects.values_list('user', flat=True)
-
-        # Exclude them from queryset
-        self.fields['user'].queryset = models.User.objects.filter(
-            role="Student"
-        ).exclude(id__in=existing_users)
+        # 🔥 Only show students
+        self.fields['user'].queryset = models.User.objects.filter(role='Student')
         
 class StudentAddAttandance(forms.ModelForm):
     user = forms.ModelChoiceField(

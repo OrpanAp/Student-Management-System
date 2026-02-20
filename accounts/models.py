@@ -46,6 +46,14 @@ class StudentResult(models.Model):
     year = models.CharField(max_length=50)
     cgpa = models.CharField(max_length=5)
     
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'year', 'semester', 'subject'],
+                name='unique_student_semester_subject'
+            )
+        ]
+    
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name}"
      

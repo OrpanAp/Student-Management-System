@@ -158,7 +158,7 @@ class StudentCreateView(mixins.StaffRequiredMixin, generic.CreateView):
     def get_success_url(self):
         return reverse('accounts:student_class', kwargs={'pk': self.object.pk})
 
-class StudentClassView(generic.CreateView):
+class StudentClassView(mixins.StaffRequiredMixin, generic.CreateView):
     template_name = "students/student_class.html"
     form_class = forms.StudentClassAssignForm
     
@@ -256,54 +256,79 @@ class StudentAddAttendanceView(mixins.StaffRequiredMixin, generic.CreateView):
         return reverse('home')
 
     
-class StudentResultListView(auth_mixins.LoginRequiredMixin, generic.ListView):
+class StudentResultListView( generic.ListView):
     template_name = "students/student_result_list.html"
     context_object_name = 'results'
+    
+    def dispatch(self, request, *args, **kwargs):
+        # If the user is anonymous, redirect to home
+        user_role = getattr(request.user, 'role', 'Guest')
+        if user_role == 'Guest':
+            return redirect('login')
+        return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
-        # Base queryset: all StudentResult objects with user and profile
         queryset = models.StudentResult.objects.select_related(
-            "user", "user__studentprofile"
-        ).filter(user__role="Student")
+            "user",
+            "user__studentprofile"
+        )
 
-        # If logged-in user is a student, only show their own results
-        if self.request.user.role == 'Student':
+        user_role = getattr(self.request.user, 'role', 'Guest')
+
+        if user_role == 'Student':
             queryset = queryset.filter(user=self.request.user)
 
-        # Search filter
-        search = self.request.GET.get('search')
-        if search:
+        # 🔎 FILTERS
+
+        year_filter = self.request.GET.get('year')
+        if year_filter:
+            queryset = queryset.filter(year=year_filter)
+
+        semester_filter = self.request.GET.get('semester')
+        if semester_filter:
+            queryset = queryset.filter(semester=semester_filter)
+
+        class_filter = self.request.GET.get('class')
+        if class_filter:
             queryset = queryset.filter(
-                Q(user__first_name__icontains=search) |
-                Q(user__last_name__icontains=search) |
-                Q(user__email__icontains=search) |
-                Q(user__studentprofile__class_list__icontains=search) |
-                Q(user__studentprofile__roll__icontains=search)
+                user__studentprofile__class_list=class_filter
             )
 
-        # Class filter
-        category_filter = self.request.GET.get('class')
-        if category_filter:
-            queryset = queryset.filter(user__studentprofile__class_list=category_filter)
-
-        return queryset
-
+        return queryset.order_by('-year', 'semester')
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # Only include classes that exist in the filtered results
-        # This ensures the dropdown matches what the user sees
-        filtered_qs = self.get_queryset()
+        queryset = context['results']
 
-        class_choices = filtered_qs.values_list(
-            'user__studentprofile__class_list', flat=True
+        grouped_results = {}
+
+        for result in queryset:
+            year = result.year
+            semester = result.semester
+
+            if year not in grouped_results:
+                grouped_results[year] = {}
+
+            if semester not in grouped_results[year]:
+                grouped_results[year][semester] = []
+
+            grouped_results[year][semester].append(result)
+
+        context['grouped_results'] = grouped_results
+
+        # For filter dropdowns
+        all_results = models.StudentResult.objects.all()
+
+        context['years'] = all_results.values_list('year', flat=True).distinct()
+        context['semesters'] = all_results.values_list('semester', flat=True).distinct()
+        context['classes'] = all_results.values_list(
+            'user__studentprofile__class_list',
+            flat=True
         ).distinct()
 
-        # Sort numerically
-        context['class_choices'] = sorted(class_choices, key=lambda x: int(x))
-
-        # Keep search term in context for form value
-        context['search_term'] = self.request.GET.get('search', '')
+        context['selected_year'] = self.request.GET.get('year', '')
+        context['selected_semester'] = self.request.GET.get('semester', '')
         context['selected_class'] = self.request.GET.get('class', '')
 
         return context

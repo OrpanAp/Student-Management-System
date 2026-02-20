@@ -5,8 +5,8 @@
 <!-- Header -->
 <section class="bg-blue-600 text-white py-12">
     <div class="max-w-7xl mx-auto px-6">
-        <h2 class="text-3xl font-bold">Student Records</h2>
-        <p class="mt-2">View and manage all registered students</p>
+        <h2 class="text-3xl font-bold">Student Results</h2>
+        <p class="mt-2">View and manage all registered student</p>
     </div>
 </section>
 
@@ -16,29 +16,35 @@
 
         {% if request.user.is_authenticated and request.user.is_staff %}
             <!-- Top Controls: Search + Class Filter + Add -->
-            <form method="get" class="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
-                
-                <!-- Search -->
-                <input 
-                type="text"
-                placeholder="Search student..."
-                name="search"
-                value="{{ search_term }}"
-                class="w-full md:w-1/3 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
-                >
-                
-                <!-- Class Filter -->
-                <select 
-                name="class"
-                class="px-3 py-2 border rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
-                onchange="this.form.submit()"
-                >
-                    <option value="">All Classes</option>
-                        {% for cls in class_choices %}
-                            <option value="{{ cls }}" {% if selected_class == cls %}selected{% endif %}>{{ cls }}</option>
-                        {% endfor %}
+            <form method="get" class="mb-6 flex gap-4">
+
+                <select name="year" onchange="this.form.submit()">
+                    <option value="">All Years</option>
+                    {% for y in years %}
+                        <option value="{{ y }}" {% if selected_year == y %}selected{% endif %}>
+                            {{ y }}
+                        </option>
+                    {% endfor %}
                 </select>
-                    
+
+                <select name="semester" onchange="this.form.submit()">
+                    <option value="">All Semesters</option>
+                    {% for s in semesters %}
+                        <option value="{{ s }}" {% if selected_semester == s %}selected{% endif %}>
+                            {{ s }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <select name="class" onchange="this.form.submit()">
+                    <option value="">All Classes</option>
+                    {% for c in classes %}
+                        <option value="{{ c }}" {% if selected_class == c %}selected{% endif %}>
+                            {{ c }}
+                        </option>
+                    {% endfor %}
+                </select>
+
                 <!-- Add Student Button -->
                 <a href="{% url "accounts:student_add_result" %}" 
                     class="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 text-center">
@@ -49,55 +55,45 @@
         {% endif %}
 
         <!-- Desktop Table -->
-        <div class="hidden lg:block bg-white shadow rounded-lg overflow-x-auto">
-            <table class="min-w-[900px] w-full table-auto">
-                <thead class="bg-gray-100">
-                    <tr>
-                        <th class="p-3 text-left">#</th>
-                        {% if request.user.is_staff %}
-                            <th class="p-3 text-left">Name</th>
-                            <th class="p-3 text-left">Email</th>
-                            <th class="p-3 text-left">Class</th>
-                            <th class="p-3 text-left">Roll</th>
-                        {% endif %}
-                        <th class="p-3 text-left">Subject</th>
-                        <th class="p-3 text-left">Semester</th>
-                        <th class="p-3 text-left">Year</th>
-                        <th class="p-3 text-left">CGPA</th>
-                        {% if request.user.is_staff %}
-                            <th class="p-3 text-left">Actions</th>
-                        {% endif %}
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for result in results %}
-                    <tr class="border-t hover:bg-gray-50">
-                        <td class="p-3">{{ forloop.counter }}</td>
-                        {% if request.user.is_staff %}
-                            <td class="p-3">{{ result.user.first_name }} {{ result.user.last_name }}</td>
-                            <td class="p-3">{{ result.user.email }}</td>
-                            <td class="p-3">{{ result.user.studentprofile.class_list|default:"-" }}</td>
-                            <td class="p-3">{{ result.user.studentprofile.roll|default:"-" }}</td>
-                        {% endif %}
-                        <td class="p-3">{{ result.subject|default:"-" }}</td>
-                        <td class="p-3">{{ result.semester|default:"-" }}</td>
-                        <td class="p-3">{{ result.year|default:"-" }}</td>
-                        <td class="p-3">{{ result.cgpa|default:"-" }}</td>
-                        {% if request.user.is_staff %}
-                            <td class="p-3 space-x-2 text-sm">
-                                <a href="#" class="text-blue-600 hover:underline">View</a>
-                                <a href="#" class="text-green-600 hover:underline">Edit</a>
-                                <a href="#" class="text-red-600 hover:underline">Delete</a>
-                            </td>
-                        {% endif %}
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="10" class="text-center p-4 text-gray-500">No results found.</td>
-                    </tr>
+        <div class=" bg-white shadow rounded-lg overflow-x-auto">
+            {% for year, semesters in grouped_results.items %}
+                <div class="mb-10">
+
+                    <h1 class="text-2xl font-bold mb-4">
+                        Academic Year {{ year }}
+                    </h1>
+
+                    {% for semester, results in semesters.items %}
+                        <div class="mb-6 p-5 border rounded-lg shadow">
+
+                            <h2 class="text-xl font-semibold mb-3">
+                                {{ semester }} Semester
+                            </h2>
+
+                            <p>
+                                <strong>Class:</strong>
+                                {{ results.0.user.studentprofile.class_list }}
+                            </p>
+
+                            <table class="w-full mt-3 border">
+                                <tr class="bg-gray-100">
+                                    <th class="p-2 border">Subject</th>
+                                    <th class="p-2 border">CGPA</th>
+                                </tr>
+
+                                {% for result in results %}
+                                    <tr>
+                                        <td class="p-2 border">{{ result.subject }}</td>
+                                        <td class="p-2 border text-center">{{ result.cgpa }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </table>
+
+                        </div>
                     {% endfor %}
-                </tbody>
-            </table>
+
+                </div>
+            {% endfor %}
         </div>
 
         <!-- Mobile Cards -->
