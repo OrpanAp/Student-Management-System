@@ -293,6 +293,14 @@ class StudentResultListView( generic.ListView):
             queryset = queryset.filter(
                 user__studentprofile__class_list=class_filter
             )
+        search = self.request.GET.get('search')
+        if search:
+            queryset = queryset.filter(
+                Q(user__first_name__icontains=search) |
+                Q(user__last_name__icontains=search) |
+                Q(user__email__icontains=search) |
+                Q(user__studentprofile__roll__icontains=search)
+            )
 
         return queryset.order_by('-year', 'semester')
     
@@ -332,3 +340,11 @@ class StudentResultListView( generic.ListView):
         context['selected_class'] = self.request.GET.get('class', '')
 
         return context
+    
+    def get_template_names(self):
+        if self.request.user.role == 'Student':
+            return ["students/student_result_list.html"]
+        elif self.request.user.is_staff:
+            return ["students/student_result_list_staff_site.html"]
+        return super().get_template_names()
+     
