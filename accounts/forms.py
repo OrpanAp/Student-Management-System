@@ -90,8 +90,8 @@ class StudentAddAttandance(forms.ModelForm):
         model = models.StudentAttendance
         fields = (
             'user',
-            'total_class_count',
             'total_attendance_count',
+            'status',
         )
 
     def __init__(self, *args, **kwargs):
@@ -114,3 +114,8 @@ class StudentResultUpdate(forms.ModelForm):
             'subject',
             'cgpa',
         )
+        
+class SubjectAssign(forms.ModelForm):
+    class Meta:
+        model = models.Subject
+        fields = '__all__'

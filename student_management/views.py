@@ -5,6 +5,9 @@ from django.contrib.auth import views as auth_views
 class HomeView(generic.TemplateView):
     template_name = "base/home.html"
     
+class FeatureView(generic.TemplateView):
+    template_name = "base/feature.html"
+    
 class UserLoginView(auth_views.LoginView):
     template_name = "registration/login.html"
 
@@ -13,3 +16,5 @@ class UserLoginView(auth_views.LoginView):
         if request.user.is_authenticated:
             return redirect('home')  # or your preferred page
         return super().dispatch(request, *args, **kwargs)
+    
+

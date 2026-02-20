@@ -52,7 +52,8 @@ class UserCreateView(generic.CreateView):
     def get_success_url(self):
         if self.role == 'Student':
             return reverse('accounts:student_class', kwargs={'pk': self.object.pk})
-        
+        if not self.request.user.is_authenticated:
+            return reverse('login')
         return reverse('home')
     
 class UserDeleteView(mixins.StaffRequiredMixin, generic.DeleteView):
@@ -369,7 +370,42 @@ class StudentResultUpdateView(mixins.StaffRequiredMixin, generic.UpdateView):
     def get_success_url(self):
         return reverse('accounts:student_result_list')
     
+class AssignAllSubjectView(mixins.StaffRequiredMixin, generic.CreateView):
+    template_name = "staffs/assign_subjects.html"
+    form_class = forms.SubjectAssign
+    
+    def get_success_url(self):
+        return reverse('accounts:subject_list')
+    
+class SubjectListView(mixins.StaffRequiredMixin, generic.ListView):
+    template_name = "staffs/subject_list.html"
+    context_object_name = 'subjects'
+    
+    def get_queryset(self):
+        return models.Subject.objects.all()
+    
+class SubjectDeleteView(mixins.StaffRequiredMixin, generic.DeleteView):
+    template_name = "staffs/subject_delete.html"
+    
+    def get_queryset(self):
+        return models.Subject.objects.all()
+    
+    def get_success_url(self):
+        return reverse('accounts:subject_list')
+    
+class SubjectUpdateView(mixins.StaffRequiredMixin, generic.UpdateView):
+    template_name = "staffs/subject_update.html"
+    form_class = forms.SubjectAssign
+
+    def get_queryset(self):
+        return models.Subject.objects.all()
+    
+    def get_success_url(self):
+        return reverse('accounts:subject_list')
     
 
+    
+class StudentAttendanceView(generic.TemplateView):
+    template_name = "students/student_attendance_list.html"
 
-     
+    

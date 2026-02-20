@@ -24,4 +24,12 @@ urlpatterns = [
     path("students/student_result_list/", views.StudentResultListView.as_view(), name="student_result_list"),
     path("students/student_result_update/<int:pk>/", views.StudentResultUpdateView.as_view(), name="student_result_update"),
     path("students/student_result_delete/<int:pk>/", views.StudentResultDeleteView.as_view(), name="student_result_delete"),
+    path("students/student_result_delete/<int:pk>/", views.StudentResultDeleteView.as_view(), name="student_result_delete"),
+    path("students/student_attendance_list/", views.StudentAttendanceView.as_view(), name="student_attendance_list"),
+    
+    
+    path("stuffs/subject/assign_subject/", views.AssignAllSubjectView.as_view(), name="assign_subject"),
+    path("stuffs/subject/subject_list/", views.SubjectListView.as_view(), name="subject_list"),
+    path("stuffs/subject/subject_update/<int:pk>/", views.SubjectUpdateView.as_view(), name="subject_update"),
+    path("stuffs/subject/subject_delete/<int:pk>/", views.SubjectDeleteView.as_view(), name="subject_delete"),
 ]

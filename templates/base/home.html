@@ -26,52 +26,6 @@
     </div>
 </section>
 
-<!-- Features -->
-<!-- Features -->
-<section class="py-20">
-    <div class="max-w-7xl mx-auto px-6">
-        <h3 class="text-3xl font-bold text-center mb-12">
-            System Features
-        </h3>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
-
-            <!-- Card -->
-            <a href="{% url 'accounts:student_list' %}" 
-               class="bg-white p-8 rounded-xl shadow text-center 
-                      hover:shadow-xl hover:-translate-y-2 
-                      transition transform duration-300 
-                      cursor-pointer block">
-
-                <h4 class="text-xl font-semibold mb-3">Student Records</h4>
-                <p>Store and manage student profiles easily.</p>
-            </a>
-
-            <!-- Card -->
-            <a href="/attendance/" 
-               class="bg-white p-8 rounded-xl shadow text-center 
-                      hover:shadow-xl hover:-translate-y-2 
-                      transition transform duration-300 
-                      cursor-pointer block">
-
-                <h4 class="text-xl font-semibold mb-3">Attendance Tracking</h4>
-                <p>Monitor daily attendance digitally.</p>
-            </a>
-
-            <!-- Card -->
-            <a href="{% url 'accounts:student_result_list' %}" 
-               class="bg-white p-8 rounded-xl shadow text-center 
-                      hover:shadow-xl hover:-translate-y-2 
-                      transition transform duration-300 
-                      cursor-pointer block">
-
-                <h4 class="text-xl font-semibold mb-3">Grades & Reports</h4>
-                <p>Generate reports and view performance.</p>
-            </a>
-
-        </div>
-    </div>
-</section>
 
 {% if not request.user.is_authenticated %}
     <!-- Call To Action -->

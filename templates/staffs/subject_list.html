@@ -1,0 +1,78 @@
+{% extends "base/main.html" %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto py-8 px-4">
+
+    <!-- Page Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <h1 class="text-3xl font-bold text-gray-800">Subjects</h1>
+        <a href="{% url 'accounts:assign_subject' %}" 
+           class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+           Add Subject
+        </a>
+    </div>
+
+    {% if subjects %}
+    
+    <!-- Desktop Table -->
+    <div class="hidden md:block bg-white rounded-xl shadow overflow-hidden">
+        <table class="min-w-full border-collapse text-sm">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="p-3 border text-left">#</th>
+                    <th class="p-3 border text-left">Subject Name</th>
+                    <th class="p-3 border text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for subject in subjects %}
+                <tr class="hover:bg-gray-50">
+                    <td class="p-3 border">{{ forloop.counter }}</td>
+                    <td class="p-3 border">{{ subject.subject }}</td>
+                    <td class="p-3 border text-center">
+                        <div class="flex justify-center gap-2">
+                            <a href="{% url "accounts:subject_update" subject.pk %}" 
+                               class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs">
+                               Edit
+                            </a>
+                            <a href="{% url "accounts:subject_delete" subject.pk %}" 
+                               class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs">
+                               Delete
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Mobile Cards -->
+    <div class="md:hidden space-y-4">
+        {% for subject in subjects %}
+        <div class="bg-white shadow rounded-lg p-4 border">
+            <div class="flex justify-between items-center">
+                <div class="font-semibold text-blue-700">{{ subject.subject }}</div>
+                <div class="flex gap-2">
+                    <a href="{% url "accounts:subject_update" subject.pk %}" 
+                       class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs">
+                        Edit
+                    </a>
+                    <a href="{% url "accounts:subject_delete" subject.pk %}" 
+                       class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs">
+                        Delete
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+        <div class="text-center text-gray-500 text-lg py-10">
+            No subjects found.
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}
