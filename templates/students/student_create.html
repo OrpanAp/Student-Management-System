@@ -1,0 +1,17 @@
+{% extends "base/main.html" %}
+{% load tailwind_filters %}
+
+{% block content %}
+
+<div class="max-w-lg mx-auto my-5">
+    <form method="post">
+        {% csrf_token %}
+        <h1 class='text-4xl text-bold mb-5'>Create a new student</h1>
+        
+        {{ form|crispy }}
+        
+        <button type="submit" class="bg-blue-500 hover:bg-blue-600 px-3 py-2 text-white w-full rounded">Submit</button>
+    </form>
+</div>
+
+{% endblock content %}

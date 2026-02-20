@@ -1,0 +1,36 @@
+{% extends "base/main.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<section class="py-12 bg-gray-50">
+    <div class="max-w-4xl mx-auto px-6">
+
+        <!-- Page Header -->
+        <h2 class="text-2xl font-bold mb-6">Update Student</h2>
+
+        <!-- Form Switch Buttons -->
+        <div class="flex gap-4 mb-6">
+            <a href="{% url 'accounts:student_update_user' student.pk %}" class="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600">User Info</a>
+            <a href="{% url 'accounts:student_update_class' student.pk %}" class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700">Class Assignment</a>
+        </div>
+
+        <!-- User Form -->
+        <div>
+            <form method="post" class="bg-white p-6 rounded-lg shadow mb-6">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <button type="submit" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg">
+                    {% if form_type == 'user' %}
+                        Save Student
+                    {% else %}
+                        Save Class
+                    {% endif %}
+                </button>
+            </form>
+        </div>
+
+    </div>
+</section>
+
+{% endblock content %}

@@ -1,0 +1,20 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management System</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="{% static 'js/main.js' %}"></script>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    
+    {% include "base/header.html" %}
+    
+    <div class="p-3">{% block content %}{% endblock content %}</div>
+
+    {% include "base/footer.html" %}
+</body>
+</html>

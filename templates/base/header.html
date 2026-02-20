@@ -1,0 +1,29 @@
+<header>
+    <nav class="bg-white shadow">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-blue-600">StudentMS</h1>
+
+            <div class="space-x-6 hidden md:block">
+                <a href="/" class="hover:text-blue-600">Home</a>
+                {% if request.user.role == 'Admin' %}
+                    <a href="{% url 'accounts:user_list' %}" class="hover:text-blue-600">Users</a>
+                {% endif %}
+                <a href="#" class="hover:text-blue-600">Features</a>
+
+                {% if not request.user.is_authenticated %}
+                    <a href="{% url 'login' %}" class="hover:text-blue-600">Login</a>
+                {% else %}
+                    <form method="post" action="{% url 'logout' %}" class="inline">
+                        {% csrf_token %}
+                        <button 
+                            type="submit"
+                            class="hover:text-blue-600 bg-transparent border-none p-0 cursor-pointer"
+                        >
+                            Logout
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+</header>

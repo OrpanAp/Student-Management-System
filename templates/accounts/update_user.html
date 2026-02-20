@@ -1,0 +1,26 @@
+{% extends "base/main.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<section class="py-12 bg-gray-50">
+    <div class="max-w-4xl mx-auto px-6">
+
+        <!-- Page Header -->
+        <h2 class="text-2xl font-bold mb-6">Update User</h2>
+
+        <!-- User Form -->
+        <div>
+            <form method="post" class="bg-white p-6 rounded-lg shadow mb-6">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <button type="submit" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg">
+                    Save User
+                </button>
+            </form>
+        </div>
+
+    </div>
+</section>
+
+{% endblock content %}

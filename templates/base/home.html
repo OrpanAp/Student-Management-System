@@ -1,0 +1,90 @@
+{% extends "base/main.html" %}
+
+
+{% block content %}
+
+<!-- Hero Section -->
+<section class="bg-blue-600 text-white">
+    <div class="max-w-7xl mx-auto px-6 py-24 text-center">
+        <h2 class="text-4xl md:text-5xl font-bold mb-6">
+            Student Management System
+        </h2>
+        <p class="text-lg md:text-xl mb-8">
+            Manage students, courses, attendance, and grades in one place.
+        </p>
+
+        {% if not request.user.is_authenticated %}
+            <div class="space-x-4">
+                <a href="{% url 'accounts:user_create' %}" class="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-200">
+                    Get Started
+                </a>
+                <a href="{% url 'login' %}" class="border border-white px-6 py-3 rounded-lg hover:bg-white hover:text-blue-600">
+                    Login
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Features -->
+<!-- Features -->
+<section class="py-20">
+    <div class="max-w-7xl mx-auto px-6">
+        <h3 class="text-3xl font-bold text-center mb-12">
+            System Features
+        </h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+
+            <!-- Card -->
+            <a href="{% url 'accounts:student_list' %}" 
+               class="bg-white p-8 rounded-xl shadow text-center 
+                      hover:shadow-xl hover:-translate-y-2 
+                      transition transform duration-300 
+                      cursor-pointer block">
+
+                <h4 class="text-xl font-semibold mb-3">Student Records</h4>
+                <p>Store and manage student profiles easily.</p>
+            </a>
+
+            <!-- Card -->
+            <a href="/attendance/" 
+               class="bg-white p-8 rounded-xl shadow text-center 
+                      hover:shadow-xl hover:-translate-y-2 
+                      transition transform duration-300 
+                      cursor-pointer block">
+
+                <h4 class="text-xl font-semibold mb-3">Attendance Tracking</h4>
+                <p>Monitor daily attendance digitally.</p>
+            </a>
+
+            <!-- Card -->
+            <a href="/grades/" 
+               class="bg-white p-8 rounded-xl shadow text-center 
+                      hover:shadow-xl hover:-translate-y-2 
+                      transition transform duration-300 
+                      cursor-pointer block">
+
+                <h4 class="text-xl font-semibold mb-3">Grades & Reports</h4>
+                <p>Generate reports and view performance.</p>
+            </a>
+
+        </div>
+    </div>
+</section>
+
+{% if not request.user.is_authenticated %}
+    <!-- Call To Action -->
+    <section class="bg-gray-900 text-white py-20">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <h3 class="text-3xl font-bold mb-6">
+                Ready to Manage Your School Smarter?
+            </h3>
+            <a href="{% url 'accounts:user_create' %}" class="bg-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-700">
+                Create Account
+            </a>
+        </div>
+    </section>
+{% endif %}
+
+{% endblock content %}

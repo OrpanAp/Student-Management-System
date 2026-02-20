@@ -1,0 +1,117 @@
+{% extends "base/main.html" %}
+{% block content %}
+
+<!-- Header -->
+<section class="bg-blue-600 text-white py-10">
+    <div class="max-w-6xl mx-auto px-6">
+        <h2 class="text-3xl font-bold">Student Details</h2>
+        <p class="mt-1">Complete student information</p>
+    </div>
+</section>
+
+<!-- Content -->
+<section class="py-10 bg-gray-50">
+<div class="max-w-6xl mx-auto px-6">
+
+<!-- Card -->
+<div class="bg-white shadow-lg rounded-lg p-6">
+
+<!-- Top Row -->
+<div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
+
+    <div>
+        <h3 class="text-2xl font-semibold">
+            {{ student.first_name }} {{ student.last_name }}
+        </h3>
+        <p class="text-gray-500">{{ student.email }}</p>
+    </div>
+
+    <div class="flex gap-3">
+        <a href="{% url 'accounts:student_update_user' student.pk %}" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+            Edit
+        </a>
+        <a href="{% url 'accounts:student_delete' student.pk %}" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+            Delete
+        </a>
+    </div>
+
+</div>
+
+<hr class="mb-6">
+
+<!-- Info Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+<!-- Personal Info -->
+<div class="border rounded-lg p-5">
+    <h4 class="text-lg font-semibold mb-4 text-blue-600">Personal Information</h4>
+
+    <div class="space-y-3 text-sm">
+
+        <div class="flex flex-col sm:flex-row sm:justify-between gap-1">
+            <span class="text-gray-600">First Name</span>
+            <span>{{ student.first_name }}</span>
+        </div>
+
+        <div class="flex flex-col sm:flex-row sm:justify-between gap-1">
+            <span class="text-gray-600">Last Name</span>
+            <span>{{ student.last_name }}</span>
+        </div>
+
+        <div class="flex flex-col sm:flex-row sm:justify-between gap-1">
+            <span class="text-gray-600">Email</span>
+            <span class="break-all">{{ student.email }}</span>
+        </div>
+        
+        <div class="flex flex-col sm:flex-row sm:justify-between gap-1">
+            <span class="text-gray-600">Username</span>
+            <span class="break-all">{{ student }}</span>
+        </div>
+
+        <div class="flex flex-col sm:flex-row sm:justify-between gap-1">
+            <span class="text-gray-600">Role</span>
+            <span>{{ student.role }}</span>
+        </div>
+
+    </div>
+</div>
+
+<!-- Academic Info -->
+<div class="border rounded-lg p-5">
+    <h4 class="text-lg font-semibold mb-4 text-blue-600">Academic Information</h4>
+
+    <div class="space-y-3 text-sm">
+
+        <div class="flex flex-col sm:flex-row sm:justify-between gap-1">
+            <span class="text-gray-600">Class</span>
+            <span>{{ student.studentprofile.class_list|default:"-" }}</span>
+        </div>
+
+        <div class="flex flex-col sm:flex-row sm:justify-between gap-1">
+            <span class="text-gray-600">Roll</span>
+            <span>{{ student.studentprofile.roll|default:"-" }}</span>
+        </div>
+
+        <div class="flex flex-col sm:flex-row sm:justify-between gap-1">
+            <span class="text-gray-600">Status</span>
+            <span class="text-green-600 font-medium">Active</span>
+        </div>
+
+    </div>
+</div>
+
+</div>
+
+<!-- Back Button -->
+<div class="mt-8">
+    <a href="{% url 'accounts:student_list' %}" 
+       class="inline-block bg-gray-700 text-white px-5 py-2 rounded hover:bg-gray-800">
+        ← Back to Students
+    </a>
+</div>
+
+</div>
+</div>
+</section>
+
+{% endblock %}
