@@ -42,6 +42,8 @@ class StudentProfile(models.Model):
 class StudentResult(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     subject = models.CharField(max_length=50)
+    semester = models.CharField(max_length=50)
+    year = models.CharField(max_length=50)
     cgpa = models.CharField(max_length=5)
     
     def __str__(self):

@@ -1,6 +1,7 @@
 from django.shortcuts import render, reverse, redirect
 from django.views import generic
 from django.db.models import Q
+from django.contrib.auth import mixins as auth_mixins
 from . import mixins
 from . import forms
 from . import models
@@ -255,7 +256,54 @@ class StudentAddAttendanceView(mixins.StaffRequiredMixin, generic.CreateView):
         return reverse('home')
 
     
-     
- 
+class StudentResultListView(auth_mixins.LoginRequiredMixin, generic.ListView):
+    template_name = "students/student_result_list.html"
+    context_object_name = 'results'
 
-    
+    def get_queryset(self):
+        # Base queryset: all StudentResult objects with user and profile
+        queryset = models.StudentResult.objects.select_related(
+            "user", "user__studentprofile"
+        ).filter(user__role="Student")
+
+        # If logged-in user is a student, only show their own results
+        if self.request.user.role == 'Student':
+            queryset = queryset.filter(user=self.request.user)
+
+        # Search filter
+        search = self.request.GET.get('search')
+        if search:
+            queryset = queryset.filter(
+                Q(user__first_name__icontains=search) |
+                Q(user__last_name__icontains=search) |
+                Q(user__email__icontains=search) |
+                Q(user__studentprofile__class_list__icontains=search) |
+                Q(user__studentprofile__roll__icontains=search)
+            )
+
+        # Class filter
+        category_filter = self.request.GET.get('class')
+        if category_filter:
+            queryset = queryset.filter(user__studentprofile__class_list=category_filter)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Only include classes that exist in the filtered results
+        # This ensures the dropdown matches what the user sees
+        filtered_qs = self.get_queryset()
+
+        class_choices = filtered_qs.values_list(
+            'user__studentprofile__class_list', flat=True
+        ).distinct()
+
+        # Sort numerically
+        context['class_choices'] = sorted(class_choices, key=lambda x: int(x))
+
+        # Keep search term in context for form value
+        context['search_term'] = self.request.GET.get('search', '')
+        context['selected_class'] = self.request.GET.get('class', '')
+
+        return context

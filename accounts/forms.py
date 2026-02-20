@@ -61,6 +61,8 @@ class StudentAddResult(forms.ModelForm):
         fields = (
             'user',
             'subject',
+            'semester',
+            'year',
             'cgpa',
         )
 
