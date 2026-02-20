@@ -1,0 +1,50 @@
+{% extends "base/main.html" %}
+
+{% block content %}
+
+<div class="min-h-[70vh] flex items-center justify-center px-4">
+
+    <div class="max-w-md w-full bg-white shadow-lg rounded-xl p-6">
+
+        <!-- Warning Icon -->
+        <div class="flex justify-center mb-4">
+            <div class="bg-red-100 text-red-600 p-4 rounded-full">
+                ⚠️
+            </div>
+        </div>
+
+        <!-- Title -->
+        <h1 class="text-2xl font-bold text-center text-gray-800 mb-2">
+            Delete Result
+        </h1>
+
+        <!-- Description -->
+        <p class="text-gray-600 text-center mb-6">
+            Are you sure you want to permanently delete this user’s information?  
+            This action cannot be undone.
+        </p>
+
+        <!-- Form -->
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+
+            <button 
+                type="submit"
+                class="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg font-medium transition duration-200"
+            >
+                Yes, Delete
+            </button>
+
+            <a 
+                href="{% url 'accounts:student_result_list' %}"
+                class="block w-full text-center border border-gray-300 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition duration-200"
+            >
+                Cancel
+            </a>
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock content %}

@@ -347,4 +347,29 @@ class StudentResultListView( generic.ListView):
         elif self.request.user.is_staff:
             return ["students/student_result_list_staff_site.html"]
         return super().get_template_names()
+    
+class StudentResultDeleteView(mixins.StaffRequiredMixin, generic.DeleteView):
+    template_name = "students/student_result_delete.html"
+    context_object_name = 'student'
+    
+    def get_queryset(self):
+        return models.StudentResult.objects.all()
+    
+    def get_success_url(self):
+        return reverse('accounts:student_result_list')
+    
+    
+class StudentResultUpdateView(mixins.StaffRequiredMixin, generic.UpdateView):
+    template_name = "students/student_update_result.html"
+    form_class = forms.StudentResultUpdate
+    
+    def get_queryset(self):
+        return models.StudentResult.objects.all()
+    
+    def get_success_url(self):
+        return reverse('accounts:student_result_list')
+    
+    
+
+
      

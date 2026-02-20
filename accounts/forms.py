@@ -104,3 +104,13 @@ class StudentAddAttandance(forms.ModelForm):
         self.fields['user'].queryset = models.User.objects.filter(
             role="Student"
         ).exclude(id__in=existing_users)
+        
+class StudentResultUpdate(forms.ModelForm):
+    class Meta:
+        model = models.StudentResult
+        fields = (
+            'year',
+            'semester',
+            'subject',
+            'cgpa',
+        )
