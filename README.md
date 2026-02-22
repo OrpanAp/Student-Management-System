@@ -105,12 +105,12 @@ Student‑Management‑System/
 
 ## 🎯 Usage
 
-🧠Use this project to understand how a Django application works:
+Use this project to understand how a Django application works:
 
-- ✔ Routing & views
-- ✔ Models & migrations
-- ✔ Form handling
-- ✔ Basic frontend templating
+✔ Routing & views  
+✔ Models & migrations  
+✔ Form handling  
+✔ Basic frontend templating
 
 ---
 
