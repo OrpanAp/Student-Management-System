@@ -105,9 +105,9 @@ Student‑Management‑System/
 
 ## 🎯 Usage
 
-```text
-Use this project to understand how a Django application works:
+--Use this project to understand how a Django application works:
 
+```text
 ✔ Routing & views
 ✔ Models & migrations
 ✔ Form handling
