@@ -113,3 +113,14 @@ Student‑Management‑System/
 ✔ Form handling
 ✔ Basic front‑end templating
 ```
+
+---
+
+## 📌 Important Notes
+
+- This is a learning project — not production ready.
+- You can expand features to include:
+   - Advanced user roles
+   - Attendance tracking
+   - API endpoints
+   - React or frontend frameworks
