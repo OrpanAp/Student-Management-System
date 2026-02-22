@@ -88,9 +88,8 @@ python manage.py runserver
 
 ---
 
+## 🗂 Project Structure
 ```text
-
-🗂 Project Structure
 
 Student‑Management‑System/
 ├── accounts/                  # Authentication & user/login logic
