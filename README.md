@@ -84,4 +84,4 @@ python manage.py runserver
 ---
 
 6. **Access the app in browser**
-   -Open → http://127.0.0.1:8000/
+7. - 📖Open → http://127.0.0.1:8000/
