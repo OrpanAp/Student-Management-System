@@ -88,12 +88,13 @@ python manage.py runserver
 
 ---
 
-## 🗂️ Project Structure
-Student‑Management‑System/
-├── accounts/                  # Authentication & user/login logic
-├── student_management/        # Main app for student CRUD functionality
-├── templates/                 # HTML template files
-├── static/                    # Static assets (CSS/JS/images)
-├── manage.py                  # Django entry point
-├── requirements.txt           # Dependencies
-└── README.md                 # Project documentation
+## 🗂 Project Structure
+
+Student-Management-System/
+|-- accounts/                  # Handles user login and authentication
+|-- student_management/        # Main app for managing student CRUD operations
+|-- templates/                 # HTML templates for all pages
+|-- static/                    # CSS, JavaScript, and images
+|-- manage.py                  # Django project entry point
+|-- requirements.txt           # Python dependencies
+`-- README.md                  # Project documentation
