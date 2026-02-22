@@ -111,3 +111,14 @@ class SubjectAssign(forms.ModelForm):
     class Meta:
         model = models.Subject
         fields = '__all__'
+        
+class StudentFinacial(forms.ModelForm):
+    class Meta:
+        model = models.StudentFinance
+        fields = (
+            'roll',
+            'total',
+            'semester',
+            'year',
+            'paid'
+        )

@@ -37,4 +37,9 @@ urlpatterns = [
     path("stuffs/subject/subject_list/", views.SubjectListView.as_view(), name="subject_list"),
     path("stuffs/subject/subject_update/<int:pk>/", views.SubjectUpdateView.as_view(), name="subject_update"),
     path("stuffs/subject/subject_delete/<int:pk>/", views.SubjectDeleteView.as_view(), name="subject_delete"),
+    
+    
+    path("stuffs/finacial/student_add_finacials/", views.StudentAddFinacialView.as_view(), name="student_add_finacials"),
+    path("stuffs/finacial/student_finance_list/", views.StudentFinanceListView.as_view(), name="student_finance_list"),
+    path("stuffs/finacial/student_update_finacials/<int:pk>/", views.StudentAddFinacialUpdateView.as_view(), name="student_update_finacials"),
 ]

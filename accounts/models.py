@@ -106,3 +106,28 @@ class TotalClassCount(models.Model):
     
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name}"
+    
+class StudentFinance(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    roll = models.ForeignKey(StudentProfile, on_delete=models.CASCADE)
+    semester = models.CharField(max_length=50)
+    year = models.CharField(max_length=50)
+    total = models.IntegerField(default=0)
+    paid = models.CharField(
+        choices=(
+            ('Paid', 'Paid'),
+            ('Unpaid', 'Unpaid')
+        ),
+        default='Unpaid')
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'year', 'semester'],
+                name='unique_student_semester_finance'
+            )
+        ]
+    
+    def __str__(self):
+        return f"{self.user.first_name} {self.user.last_name}"

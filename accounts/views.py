@@ -427,7 +427,8 @@ class StudentAddAttendanceView(mixins.StaffRequiredMixin, generic.CreateView):
             form.add_error(None, f"Attendance for {roll.roll} for this subject is already marked today.")
             return self.form_invalid(form)     
         
-        return super(StudentAddAttendanceView, self).form_valid(form)
+        self.object = attendance_record   # ✅ IMPORTANT
+        return redirect(self.get_success_url())
     
     def get_success_url(self):
         return reverse('accounts:student_attendance_list')
@@ -478,10 +479,67 @@ class StdentAttendanceUpdateView(mixins.StaffRequiredMixin, generic.UpdateView):
         roll = form.cleaned_data['roll']
         attendance_record.user = roll.user
         attendance_record.save()
-        return super().form_valid(form)
+        return super(StdentAttendanceUpdateView, self).form_valid(form)
 
     def get_success_url(self):
         return reverse('accounts:student_attendance_list')
+    
+class StudentAddFinacialView(mixins.StaffRequiredMixin, generic.CreateView):
+    template_name = "students/student_add_finacials.html"
+    form_class = forms.StudentFinacial
+    
+    def form_valid(self, form):
+        track_summary = form.save(commit = False)
+        roll = form.cleaned_data['roll']
+        semester = form.cleaned_data['semester']
+        year = form.cleaned_data['year']
+        track_summary.user = roll.user
+        
+        # Save and block duplicates
+        try:
+            track_summary.save()
+        except IntegrityError:
+            form.add_error(None, f"Financial summary for {roll.roll} for this Semester {semester} is already marked on year {year}.")
+            return self.form_invalid(form)
+        
+        self.object = track_summary   # ✅ IMPORTANT
+        return redirect(self.get_success_url())
+    
+    def get_success_url(self):
+        return reverse('accounts:student_finance_list')
+    
+class StudentFinanceListView(auth_mixins.LoginRequiredMixin, generic.ListView):
+    template_name = "students/student_finance_list.html"
+    context_object_name = 'summaries'
+    
+    def get_queryset(self):
+        queryset = models.StudentFinance.objects.filter(user__role = 'Student')
+        user = self.request.user
+        
+        if user.role == 'Student':
+            queryset = queryset.filter(user=user)
+        return queryset.order_by('-created_at')
+    
+class StudentAddFinacialUpdateView(mixins.StaffRequiredMixin, generic.UpdateView):
+    template_name = "students/student_update_finacials.html"
+    form_class = forms.StudentFinacial
+    
+    def form_valid(self, form):
+        track_summary = form.save(commit = False)
+        roll = form.cleaned_data['roll']
+        track_summary.user = roll.user
+        track_summary.save()
+        return super(StudentAddFinacialUpdateView, self).form_valid(form)
+        
+    def get_queryset(self):
+        return models.StudentFinance.objects.filter(user__role = 'Student')
+    
+    def get_success_url(self):
+        return reverse('accounts:student_finance_list')
+    
+
+    
+
     
     
         
