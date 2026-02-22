@@ -105,7 +105,7 @@ Student‑Management‑System/
 
 ## 🎯 Usage
 
--- 🧠Use this project to understand how a Django application works:
+--- 🧠Use this project to understand how a Django application works:
 
 ```text
 ✔ Routing & views
@@ -119,7 +119,7 @@ Student‑Management‑System/
 ## 📌 Important Notes
 
 - 🌟This is a learning project — not production ready.
-- You can expand features to include:
+- ➕You can expand features to include:
    - Advanced user roles
    - Attendance tracking
    - API endpoints
@@ -129,7 +129,7 @@ Student‑Management‑System/
 
  ## 🧑‍💻 Contributions
 
--- 🖐️You’re welcome to contribute!
+--- 🖐️You’re welcome to contribute!
 
 1. Fork the repository
 2. Create a feature branch
