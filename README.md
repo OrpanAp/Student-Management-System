@@ -48,13 +48,13 @@ cd Student‑Management‑System
 
 2. **Create & activate a virtual environment**
 
----🌟Linux / macOS
+--- 🌟Linux / macOS
 ```bash
 python3 ‑m venv venv
 source venv/bin/activate
 ```
 
----🌟Windows PowerShell
+--- 🌟Windows PowerShell
 ```bash
 venv\Scripts\Activate.ps1
 ```
@@ -105,7 +105,7 @@ Student‑Management‑System/
 
 ## 🎯 Usage
 
---Use this project to understand how a Django application works:
+-- 🧠Use this project to understand how a Django application works:
 
 ```text
 ✔ Routing & views
@@ -118,7 +118,7 @@ Student‑Management‑System/
 
 ## 📌 Important Notes
 
-- This is a learning project — not production ready.
+- 🌟This is a learning project — not production ready.
 - You can expand features to include:
    - Advanced user roles
    - Attendance tracking
@@ -129,7 +129,7 @@ Student‑Management‑System/
 
  ## 🧑‍💻 Contributions
 
--- You’re welcome to contribute!
+-- 🖐️You’re welcome to contribute!
 
 1. Fork the repository
 2. Create a feature branch
