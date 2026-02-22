@@ -85,3 +85,15 @@ python manage.py runserver
 
 6. **Access the app in browser**
 - 📖Open → http://127.0.0.1:8000/
+
+---
+
+## 🗂️ Project Structure
+Student‑Management‑System/
+├── accounts/                  # Authentication & user/login logic
+├── student_management/        # Main app for student CRUD functionality
+├── templates/                 # HTML template files
+├── static/                    # Static assets (CSS/JS/images)
+├── manage.py                  # Django entry point
+├── requirements.txt           # Dependencies
+└── README.md                 # Project documentation
