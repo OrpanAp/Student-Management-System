@@ -54,11 +54,18 @@ class StudentUpdateClassAssignForm(forms.ModelForm):
 class StudentAddResult(forms.ModelForm):
     class Meta:
         model = models.StudentResult
-        fields = '__all__'
+        fields = (
+            'roll',
+            'year',
+            'semester',
+            'subject',
+            'cgpa'
+        )
 
     def clean(self):
         cleaned_data = super().clean()
-        user = cleaned_data.get('user')
+        roll = cleaned_data.get('roll')
+        user = roll.user if roll else None
         year = cleaned_data.get('year')
         semester = cleaned_data.get('semester')
         subject = cleaned_data.get('subject')
@@ -79,31 +86,16 @@ class StudentAddResult(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         # 🔥 Only show students
-        self.fields['user'].queryset = models.User.objects.filter(role='Student')
+        self.fields['roll'].queryset = models.StudentProfile.objects.select_related('user').filter(user__role='Student')
         
 class StudentAddAttandance(forms.ModelForm):
-    user = forms.ModelChoiceField(
-        queryset=models.User.objects.filter(role="Student"), label="Student"
-    )
-    
     class Meta:
         model = models.StudentAttendance
         fields = (
-            'user',
-            'total_attendance_count',
+            'roll',
+            'subject',
             'status',
         )
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # Get users who already have results
-        existing_users = models.StudentResult.objects.values_list('user', flat=True)
-
-        # Exclude them from queryset
-        self.fields['user'].queryset = models.User.objects.filter(
-            role="Student"
-        ).exclude(id__in=existing_users)
         
 class StudentResultUpdate(forms.ModelForm):
     class Meta:

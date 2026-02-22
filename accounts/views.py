@@ -1,3 +1,4 @@
+from django.db import IntegrityError
 from django.shortcuts import render, reverse, redirect
 from django.views import generic
 from django.db.models import Q
@@ -7,6 +8,7 @@ from . import forms
 from . import models
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import PermissionDenied
+from django.utils import timezone
 import datetime
 import random
 
@@ -246,18 +248,21 @@ class StudentAddResultView(mixins.StaffRequiredMixin, generic.CreateView):
     template_name = "students/student_add_result.html"
     form_class = forms.StudentAddResult
     
-    def get_success_url(self):
-        return reverse('home')
-
-class StudentAddAttendanceView(mixins.StaffRequiredMixin, generic.CreateView):
-    template_name = "students/student_add_result.html"
-    form_class = forms.StudentAddAttandance
+    def form_valid(self, form):
+        result_form = form.save(commit=False)
+        roll = form.cleaned_data['roll']
+        result_form.user = roll.user
+        result_form.save()
+        
+        return super().form_valid(form)
+    
     
     def get_success_url(self):
         return reverse('home')
 
+
     
-class StudentResultListView( generic.ListView):
+class StudentResultListView(auth_mixins.LoginRequiredMixin, generic.ListView):
     template_name = "students/student_result_list.html"
     context_object_name = 'results'
     
@@ -405,7 +410,83 @@ class SubjectUpdateView(mixins.StaffRequiredMixin, generic.UpdateView):
     
 
     
-class StudentAttendanceView(generic.TemplateView):
+class StudentAddAttendanceView(mixins.StaffRequiredMixin, generic.CreateView):
+    template_name = "students/student_add_attendance.html"
+    form_class = forms.StudentAddAttandance
+    
+    def form_valid(self, form):
+        attendance_record = form.save(commit=False)
+        roll = form.cleaned_data['roll']
+        attendance_record.user = roll.user
+        attendance_record.created_at = timezone.localdate()
+        
+        # Save and block duplicates
+        try:
+            attendance_record.save()
+        except IntegrityError:
+            form.add_error(None, f"Attendance for {roll.roll} for this subject is already marked today.")
+            return self.form_invalid(form)     
+        
+        return super(StudentAddAttendanceView, self).form_valid(form)
+    
+    def get_success_url(self):
+        return reverse('accounts:student_attendance_list')
+    
+    
+class StudentAttendanceView(auth_mixins.LoginRequiredMixin, generic.ListView):
     template_name = "students/student_attendance_list.html"
+    context_object_name = 'attendance_records'
+    
+    def get_queryset(self):
+        queryset = models.StudentAttendance.objects.select_related(
+            'user',
+            'user__studentprofile',
+            'subject'
+        ).prefetch_related(
+            'user__totalclasses'
+        ).filter(
+            user__role = 'Student'
+        ).order_by(
+            '-created_at'
+        )
+        
+        if self.request.user.role == "Student":
+            queryset = queryset.filter(user=self.request.user)
+        return queryset
+    
+class StdentAttendanceUpdateView(mixins.StaffRequiredMixin, generic.UpdateView):
+    template_name = "students/student_update_attendance.html"
+    form_class = forms.StudentAddAttandance
+    
+    def get_queryset(self):
+        queryset = models.StudentAttendance.objects.select_related(
+            'user',
+            'user__studentprofile',
+            'subject'
+        ).prefetch_related(
+            'user__totalclasses'
+        ).filter(
+            user__role = 'Student'
+        ).order_by(
+            '-created_at'
+        )
+    
+        return queryset
+        
+    def form_valid(self, form):
+        attendance_record = form.save(commit=False)
+        roll = form.cleaned_data['roll']
+        attendance_record.user = roll.user
+        attendance_record.save()
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('accounts:student_attendance_list')
+    
+    
+        
+        
+
+    
 
     

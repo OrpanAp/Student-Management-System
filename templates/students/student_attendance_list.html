@@ -1,174 +1,135 @@
 {% extends "base/main.html" %}
+{% block title %}Attendance Dashboard{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto py-8 px-4">
 
-    <!-- Page Header -->
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-        <h1 class="text-3xl font-bold text-gray-800">Student Attendance</h1>
-        <a href=""
-           class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-            Mark Attendance
-        </a>
+{% if request.user.role == 'Student' %}
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-8">
+
+        <!-- Total Classes -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <h2 class="text-gray-500 text-sm">Total Classes</h2>
+            <p class="text-3xl font-bold text-indigo-600 mt-2">{{ total_classes }}</p>
+        </div>
+
+        <!-- Total Present -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <h2 class="text-gray-500 text-sm">Total Present</h2>
+            <p class="text-3xl font-bold text-green-600 mt-2">{{ total_present }}</p>
+        </div>
+
+        <!-- Attendance Percentage -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <h2 class="text-gray-500 text-sm">Attendance %</h2>
+            <p class="text-3xl font-bold text-blue-600 mt-2">{{ attendance_percentage }}%</p>
+        </div>
+
+    </div>
+{% endif %}
+
+<!-- Attendance Table / Cards -->
+<div class="bg-white rounded-xl shadow-md overflow-hidden">
+
+    <div class="p-4 border-b flex justify-between items-center">
+        <h2 class="text-lg font-semibold text-gray-700">Attendance Records</h2>
+        {% if request.user.is_authenticated and request.user.is_staff%}
+            <a href="{% url 'accounts:student_add_attendance' %}" 
+            class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+                + Mark Attendance
+            </a>
+        {% endif %}
     </div>
 
-    <!-- Filter Section -->
-    <div class="bg-white p-4 rounded-lg shadow mb-8">
-        <form method="get" class="flex flex-col md:flex-row gap-4 md:items-end">
-
-            <!-- Search -->
-            <div class="flex-1">
-                <label class="block text-sm text-gray-700 mb-1">Search Student</label>
-                <input type="text" name="search" value="{{ request.GET.search }}"
-                       placeholder="Name, roll..."
-                       class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500">
-            </div>
-
-            <!-- Date Filter -->
-            <div>
-                <label class="block text-sm text-gray-700 mb-1">Date</label>
-                <input type="date" name="date" value="{{ request.GET.date }}"
-                       class="border rounded p-2 focus:ring-2 focus:ring-blue-500">
-            </div>
-
-            <!-- Class Filter -->
-            <div>
-                <label class="block text-sm text-gray-700 mb-1">Class</label>
-                <select name="class" class="border rounded p-2 focus:ring-2 focus:ring-blue-500">
-                    <option value="">All Classes</option>
-                    {% for c in classes %}
-                        <option value="{{ c.id }}"
-                            {% if request.GET.class == c.id|stringformat:"s" %}selected{% endif %}>
-                            {{ c }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <button type="submit"
-                class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
-                Apply
-            </button>
-        </form>
-    </div>
-
-    {% if attendance_list %}
-
-    <!-- Desktop Table -->
-    <div class="hidden md:block bg-white rounded-xl shadow overflow-hidden">
-        <table class="min-w-full border-collapse text-sm">
-            <thead class="bg-gray-100">
+    <div class="overflow-x-auto">
+        <!-- Desktop Table -->
+        <table class="table-fixed min-w-full divide-y divide-gray-200 hidden md:table">
+            <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
                 <tr>
-                    <th class="p-3 border text-left">Student</th>
-                    <th class="p-3 border text-left">Class</th>
-                    <th class="p-3 border text-left">Roll</th>
-                    <th class="p-3 border text-left">Date</th>
-                    <th class="p-3 border text-center">Status</th>
-                    <th class="p-3 border text-center">Actions</th>
+                    <th class="w-1/5 px-4 py-3 text-center">Date</th>
+                    {% if request.user.is_authenticated and request.user.is_staff %}
+                        <th class="w-1/5 px-4 py-3 text-center">Student</th>
+                    {% endif %}
+                    <th class="w-1/5 px-4 py-3 text-center">Subject</th>
+                    <th class="w-1/5 px-4 py-3 text-center">Status</th>
+                    <th class="w-1/5 px-4 py-3 text-center">Total Classes</th>
+                    {% if request.user.is_authenticated and request.user.is_staff %}
+                        <th class="w-1/5 px-4 py-3 text-center">Actions</th>
+                    {% endif %}
                 </tr>
             </thead>
-            <tbody>
-                {% for attendance in attendance_list %}
-                <tr class="hover:bg-gray-50">
-                    <td class="p-3 border">
-                        {{ attendance.student.first_name }} {{ attendance.student.last_name }}
-                    </td>
-                    <td class="p-3 border">
-                        {{ attendance.student.studentprofile.class_list }}
-                    </td>
-                    <td class="p-3 border">
-                        {{ attendance.student.studentprofile.roll }}
-                    </td>
-                    <td class="p-3 border">
-                        {{ attendance.date }}
-                    </td>
-                    <td class="p-3 border text-center">
-                        {% if attendance.status == "Present" %}
-                            <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold">
-                                Present
-                            </span>
-                        {% elif attendance.status == "Absent" %}
-                            <span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-semibold">
-                                Absent
-                            </span>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for record in attendance_records %}
+                <tr class="hover:bg-gray-50 transition">
+                    <!-- Center all cells -->
+                    <td class="px-4 py-3 text-center">{{ record.created_at|date:"M d, Y" }}</td>
+                    {% if request.user.is_authenticated and request.user.is_staff %}
+                        <td class="px-4 py-3 text-center">{{ record.user.first_name }} {{ record.user.last_name }}</td>
+                    {% endif %}
+                    <td class="px-4 py-3 text-center">{{ record.subject }}</td>
+                    <td class="px-4 py-3 text-center">
+                        {% if record.status == "Present" %}
+                            <span class="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs">Present</span>
+                        {% elif record.status == "Absent" %}
+                            <span class="px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs">Absent</span>
                         {% else %}
-                            <span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-semibold">
-                                Late
-                            </span>
+                            <span class="px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 text-xs">Late</span>
                         {% endif %}
                     </td>
-                    <td class="p-3 border text-center">
-                        <div class="flex justify-center gap-2">
-                            <a href="{% url 'accounts:attendance_edit' attendance.id %}"
-                               class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-xs">
-                                Edit
-                            </a>
-
-                            <form method="post"
-                                  action="{% url 'accounts:attendance_delete' attendance.id %}">
-                                {% csrf_token %}
-                                <button type="submit"
-                                    class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs">
-                                    Delete
-                                </button>
-                            </form>
-                        </div>
+                    <td class="px-4 py-3 text-center">
+                        {{ record.user.total_classes_count }}
+                    </td>
+                    {% if request.user.is_authenticated and request.user.is_staff %}
+                        <td class="px-4 py-3 text-center">
+                            <a href="{% url "accounts:student_attendance_update" record.pk%}" class="text-blue-600 hover:text-blue-800 font-semibold text-sm">Edit</a>
+                        </td>
+                    {% endif %}
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="{% if request.user.is_authenticated and request.user.is_staff %}5{% else %}3{% endif %}" class="text-center py-6 text-gray-400">
+                        No attendance records found.
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-    </div>
 
-    <!-- Mobile Cards -->
-    <div class="md:hidden space-y-4">
-        {% for attendance in attendance_list %}
-        <div class="bg-white rounded-lg shadow p-4 border">
-            <div class="font-semibold text-blue-700 mb-2">
-                {{ attendance.student.first_name }} {{ attendance.student.last_name }}
-            </div>
+        <!-- Mobile Cards -->
+        <div class="md:hidden space-y-4 p-4">
+            {% for record in attendance_records %}
+            <div class="bg-gray-50 rounded-lg p-4 shadow-sm">
+                <div class="flex justify-between items-center mb-2">
 
-            <div class="text-sm text-gray-600 space-y-1">
-                <p><span class="font-medium">Class:</span> {{ attendance.student.studentprofile.class_list }}</p>
-                <p><span class="font-medium">Roll:</span> {{ attendance.student.studentprofile.roll }}</p>
-                <p><span class="font-medium">Date:</span> {{ attendance.date }}</p>
-                <p>
-                    <span class="font-medium">Status:</span>
-                    {% if attendance.status == "Present" %}
-                        <span class="text-green-600 font-semibold">Present</span>
-                    {% elif attendance.status == "Absent" %}
-                        <span class="text-red-600 font-semibold">Absent</span>
-                    {% else %}
-                        <span class="text-yellow-600 font-semibold">Late</span>
+                    {% if request.user.is_authenticated and request.user.is_staff%}
+                    <div class="text-gray-600 text-sm font-semibold">
+                        {{ record.user.first_name }} {{ record.user.last_name }}
+                    </div>
+                    <a href="{% url "accounts:student_attendance_update" record.pk%}" 
+                    class="text-blue-600 hover:text-blue-800 text-sm font-semibold">
+                        Edit
+                    </a>
                     {% endif %}
-                </p>
+                </div>
+                <div class="text-gray-500 text-xs mb-1">Date: {{ record.created_at|date:"M d, Y" }}</div>
+                <div class="text-gray-500 text-xs mb-1">Subject: {{ record.subject }}</div>
+                <div>
+                    Status:
+                    {% if record.status == "Present" %}
+                        <span class="px-2 py-1 rounded-full bg-green-100 text-green-700 text-xs">Present</span>
+                    {% elif record.status == "Absent" %}
+                        <span class="px-2 py-1 rounded-full bg-red-100 text-red-700 text-xs">Absent</span>
+                    {% else %}
+                        <span class="px-2 py-1 rounded-full bg-yellow-100 text-yellow-700 text-xs">Late</span>
+                    {% endif %}
+                </div>
             </div>
-
-            <div class="mt-4 flex gap-2">
-                <a href="{% url 'accounts:attendance_edit' attendance.id %}"
-                   class="flex-1 bg-yellow-500 text-white text-center py-2 rounded text-sm">
-                    Edit
-                </a>
-
-                <form method="post"
-                      action="{% url 'accounts:attendance_delete' attendance.id %}"
-                      class="flex-1">
-                    {% csrf_token %}
-                    <button type="submit"
-                        class="w-full bg-red-500 text-white py-2 rounded text-sm">
-                        Delete
-                    </button>
-                </form>
-            </div>
+            {% empty %}
+            <div class="text-center py-6 text-gray-400">No attendance records found.</div>
+            {% endfor %}
         </div>
-        {% endfor %}
+
     </div>
-
-    {% else %}
-        <div class="text-center text-gray-500 text-lg py-10">
-            No attendance records found.
-        </div>
-    {% endif %}
-
 </div>
+
 {% endblock %}

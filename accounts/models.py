@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.utils import timezone
+from django.db.models import Sum
 
 
 class User(AbstractUser):
@@ -22,6 +24,12 @@ class User(AbstractUser):
             self.is_staff = True
         super().save(*args, **kwargs)
     
+
+    @property
+    def total_classes_count(self):
+        # Use the related_name 'totalclasses' from TotalClassCount
+        return self.totalclasses.aggregate(total=Sum('total_class_count'))['total'] or 0
+    
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
     
@@ -41,11 +49,12 @@ class StudentProfile(models.Model):
     
     
     def __str__(self):
-        return f"{self.user.first_name} {self.user.last_name}"
+        return self.roll
     
 
 class StudentResult(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    roll = models.ForeignKey(StudentProfile, on_delete=models.CASCADE)
     subject = models.ForeignKey(Subject, null=True, blank=True, on_delete=models.SET_NULL)
     semester = models.CharField(max_length=50)
     year = models.CharField(max_length=50)
@@ -64,7 +73,7 @@ class StudentResult(models.Model):
      
 class StudentAttendance(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    total_attendance_count = models.IntegerField()
+    roll = models.ForeignKey(StudentProfile, on_delete=models.CASCADE)
     subject = models.ForeignKey(Subject, null=True, blank=True, on_delete=models.SET_NULL)
     status = models.CharField(
         max_length=10,
@@ -72,15 +81,24 @@ class StudentAttendance(models.Model):
             ("Present", "Present"),
             ("Absent", "Absent"),
             ("Late", "Late"),
-        ),
+        ), 
+        default='Absent'
     )
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateField(default=timezone.localdate)
+    
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['roll', 'subject', 'created_at'],
+                name='unique_attendance_per_day_per_subject'
+            )
+        ]
     
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name}"
     
 class TotalClassCount(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="totalclasses")
     at_class = models.CharField(max_length=5)
     subject = models.ForeignKey(Subject, null=True, blank=True, on_delete=models.SET_NULL)
     total_class_count = models.IntegerField()

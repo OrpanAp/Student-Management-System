@@ -19,13 +19,18 @@ urlpatterns = [
     path("students/student_update_user/<int:pk>/", views.StudentAccountUpdateView.as_view(), name="student_update_user"),
     path("students/student_update_class/<int:pk>/", views.StudentClassUpdateView.as_view(), name="student_update_class"),
     path("students/student_delete/<int:pk>/", views.StudentDeleteView.as_view(), name="student_delete"),
+    
+    
     path("students/student_add_result/", views.StudentAddResultView.as_view(), name="student_add_result"),
-    path("students/student_add_attendance/", views.StudentAddAttendanceView.as_view(), name="student_add_attendance"),
     path("students/student_result_list/", views.StudentResultListView.as_view(), name="student_result_list"),
     path("students/student_result_update/<int:pk>/", views.StudentResultUpdateView.as_view(), name="student_result_update"),
     path("students/student_result_delete/<int:pk>/", views.StudentResultDeleteView.as_view(), name="student_result_delete"),
     path("students/student_result_delete/<int:pk>/", views.StudentResultDeleteView.as_view(), name="student_result_delete"),
+    
+    
+    path("students/student_add_attendance/", views.StudentAddAttendanceView.as_view(), name="student_add_attendance"),
     path("students/student_attendance_list/", views.StudentAttendanceView.as_view(), name="student_attendance_list"),
+    path("students/student_attendance_update/<int:pk>/", views.StdentAttendanceUpdateView.as_view(), name="student_attendance_update"),
     
     
     path("stuffs/subject/assign_subject/", views.AssignAllSubjectView.as_view(), name="assign_subject"),
