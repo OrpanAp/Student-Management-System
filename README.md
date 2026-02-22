@@ -43,3 +43,45 @@ Make sure you have the following installed:
 ```bash
 git clone https://github.com/OrpanAp/Student‑Management‑System.git
 cd Student‑Management‑System
+```
+---
+
+2. **Create & activate a virtual environment**
+
+---🌟Linux / macOS
+```bash
+python3 ‑m venv venv
+source venv/bin/activate
+```
+
+---🌟Windows PowerShell
+```bash
+venv\Scripts\Activate.ps1
+```
+
+---
+
+3. **Install dependencies**
+```bash
+pip install ‑r requirements.txt
+```
+
+---
+
+4. **Apply database migrations**
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
+
+---
+
+5. **Run the Django development server**
+```bash
+python manage.py runserver
+```
+
+---
+
+6. **Access the app in browser**
+-Open → http://127.0.0.1:8000/
