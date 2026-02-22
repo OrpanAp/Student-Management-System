@@ -33,7 +33,6 @@ Make sure you have the following installed:
 - Python 3.x  
 - pip  
 - Virtual environment (recommended)
-- For more check: requirements.txt
 
 ---
 
