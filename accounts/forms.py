@@ -97,6 +97,10 @@ class StudentAddAttandance(forms.ModelForm):
             'status',
         )
         
+class AttendanceSelectionForm(forms.Form):
+    class_name = forms.CharField(label="Class")
+    subject = forms.ModelChoiceField(queryset=models.Subject.objects.all())
+        
 class StudentResultUpdate(forms.ModelForm):
     class Meta:
         model = models.StudentResult

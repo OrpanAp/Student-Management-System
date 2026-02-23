@@ -1,5 +1,6 @@
 from django.db import IntegrityError
 from django.shortcuts import render, reverse, redirect
+from django.views import View
 from django.views import generic
 from django.db.models import Q
 from django.contrib.auth import mixins as auth_mixins
@@ -407,31 +408,49 @@ class SubjectUpdateView(mixins.StaffRequiredMixin, generic.UpdateView):
     
     def get_success_url(self):
         return reverse('accounts:subject_list')
-    
 
-    
-class StudentAddAttendanceView(mixins.StaffRequiredMixin, generic.CreateView):
+
+class StudentAddAttendanceView(mixins.StaffRequiredMixin, View):
     template_name = "students/student_add_attendance.html"
-    form_class = forms.StudentAddAttandance
-    
-    def form_valid(self, form):
-        attendance_record = form.save(commit=False)
-        roll = form.cleaned_data['roll']
-        attendance_record.user = roll.user
-        attendance_record.created_at = timezone.localdate()
-        
-        # Save and block duplicates
-        try:
-            attendance_record.save()
-        except IntegrityError:
-            form.add_error(None, f"Attendance for {roll.roll} for this subject is already marked today.")
-            return self.form_invalid(form)     
-        
-        self.object = attendance_record   # ✅ IMPORTANT
-        return redirect(self.get_success_url())
-    
-    def get_success_url(self):
-        return reverse('accounts:student_attendance_list')
+
+    def get(self, request):
+        form = forms.AttendanceSelectionForm(request.GET or None)
+        students = None
+
+        if form.is_valid():
+            class_name = form.cleaned_data['class_name']
+            students = models.StudentProfile.objects.filter(class_list=class_name)
+
+        return render(request, self.template_name, {
+            "form": form,
+            "students": students
+        })
+
+    def post(self, request):
+        form = forms.AttendanceSelectionForm(request.POST)
+
+        if form.is_valid():
+            class_name = form.cleaned_data['class_name']
+            subject = form.cleaned_data['subject']
+
+            students = models.StudentProfile.objects.filter(class_list=class_name)
+
+            for student in students:
+                status = request.POST.get(f"status_{student.id}")
+
+                models.StudentAttendance.objects.update_or_create(
+                    roll=student,
+                    subject=subject,
+                    created_at=timezone.localdate(),
+                    defaults={
+                        "user": student.user,
+                        "status": status
+                    }
+                )
+
+            return redirect("accounts:student_attendance_list")
+
+        return render(request, self.template_name, {"form": form})
     
     
 class StudentAttendanceView(auth_mixins.LoginRequiredMixin, generic.ListView):
