@@ -1,9 +1,11 @@
 from django.db import IntegrityError
 from django.shortcuts import render, reverse, redirect
+from django.urls import reverse_lazy
 from django.views import View
 from django.views import generic
 from django.db.models import Q
 from django.contrib.auth import mixins as auth_mixins
+from django.contrib.auth.models import Group
 from . import mixins
 from . import forms
 from . import models
@@ -556,6 +558,28 @@ class StudentAddFinacialUpdateView(mixins.StaffRequiredMixin, generic.UpdateView
     def get_success_url(self):
         return reverse('accounts:student_finance_list')
     
+
+class GroupPermissionView(mixins.StaffRequiredMixin, generic.FormView):
+    template_name = "staffs/manage_group_permissions.html"
+    form_class = forms.GroupPermissionForm
+    success_url = reverse_lazy("accounts:manage_group_permissions")
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        group_id = self.request.GET.get("group")  # Optional: pass ?group=ID
+        if group_id:
+            try:
+                group_instance = Group.objects.get(id=group_id)
+                kwargs['group_instance'] = group_instance
+            except Group.DoesNotExist:
+                pass
+        return kwargs
+
+    def form_valid(self, form):
+        group = form.cleaned_data['group']
+        permissions = form.cleaned_data['permissions']
+        group.permissions.set(permissions)
+        return super().form_valid(form)
 
     
 

@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 from django.db.models import Sum
+from django.contrib.auth.models import Group
 
 
 class User(AbstractUser):
@@ -22,8 +23,19 @@ class User(AbstractUser):
         if self.is_superuser:
             self.role = "Admin"
             self.is_staff = True
+        else:
+            # Decide staff status based on role
+            if self.role in ["Admin", "Manager", "Accounts", "Teacher"]:
+                self.is_staff = True
+            else:
+                self.is_staff = False
+                
         super().save(*args, **kwargs)
-    
+
+        # Assign user to group based on role
+        group, created = Group.objects.get_or_create(name=self.role)
+        self.groups.clear()  # Optional: remove from other groups
+        self.groups.add(group)
 
     @property
     def total_classes_count(self):

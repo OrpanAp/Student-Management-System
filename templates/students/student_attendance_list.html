@@ -2,134 +2,131 @@
 {% block title %}Attendance Dashboard{% endblock %}
 
 {% block content %}
+{% if not request.user.role == 'Accounts' %}
+    {% if request.user.role == 'Student' %}
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-8">
 
-{% if request.user.role == 'Student' %}
-    <!-- Summary Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-8">
+            <!-- Total Classes -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h2 class="text-gray-500 text-sm">Total Classes</h2>
+                <p class="text-3xl font-bold text-indigo-600 mt-2">{{ total_classes }}</p>
+            </div>
 
-        <!-- Total Classes -->
-        <div class="bg-white rounded-xl shadow-md p-6">
-            <h2 class="text-gray-500 text-sm">Total Classes</h2>
-            <p class="text-3xl font-bold text-indigo-600 mt-2">{{ total_classes }}</p>
+            <!-- Total Present -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h2 class="text-gray-500 text-sm">Total Present</h2>
+                <p class="text-3xl font-bold text-green-600 mt-2">{{ total_present }}</p>
+            </div>
+
+            <!-- Attendance Percentage -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h2 class="text-gray-500 text-sm">Attendance %</h2>
+                <p class="text-3xl font-bold text-blue-600 mt-2">{{ attendance_percentage }}%</p>
+            </div>
+
+        </div>
+    {% endif %}
+
+    <!-- Attendance Table / Cards -->
+    <div class="bg-white rounded-xl shadow-md overflow-hidden">
+
+        <div class="p-4 border-b flex justify-between items-center">
+            <h2 class="text-lg font-semibold text-gray-700">Attendance Records</h2>
+            {% if request.user.is_authenticated and request.user.is_staff%}
+                <a href="{% url 'accounts:student_add_attendance' %}" 
+                class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+                    + Mark Attendance
+                </a>
+            {% endif %}
         </div>
 
-        <!-- Total Present -->
-        <div class="bg-white rounded-xl shadow-md p-6">
-            <h2 class="text-gray-500 text-sm">Total Present</h2>
-            <p class="text-3xl font-bold text-green-600 mt-2">{{ total_present }}</p>
-        </div>
+        <div class="overflow-x-auto">
+            <!-- Desktop Table -->
+            <table class="table-fixed min-w-full divide-y divide-gray-200 hidden md:table">
+                <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
+                    <tr>
+                        <th class="w-1/5 px-4 py-3 text-center">Date</th>
+                        {% if request.user.is_authenticated and request.user.is_staff %}
+                            <th class="w-1/5 px-4 py-3 text-center">Student</th>
+                        {% endif %}
+                        <th class="w-1/5 px-4 py-3 text-center">Subject</th>
+                        <th class="w-1/5 px-4 py-3 text-center">Status</th>
+                        {% if request.user.is_authenticated and request.user.is_staff %}
+                            <th class="w-1/5 px-4 py-3 text-center">Actions</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for record in attendance_records %}
+                    <tr class="hover:bg-gray-50 transition">
+                        <!-- Center all cells -->
+                        <td class="px-4 py-3 text-center">{{ record.created_at|date:"M d, Y" }}</td>
+                        {% if request.user.is_authenticated and request.user.is_staff %}
+                            <td class="px-4 py-3 text-center">{{ record.user.first_name }} {{ record.user.last_name }}</td>
+                        {% endif %}
+                        <td class="px-4 py-3 text-center">{{ record.subject }}</td>
+                        <td class="px-4 py-3 text-center">
+                            {% if record.status == "Present" %}
+                                <span class="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs">Present</span>
+                            {% elif record.status == "Absent" %}
+                                <span class="px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs">Absent</span>
+                            {% else %}
+                                <span class="px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 text-xs">Late</span>
+                            {% endif %}
+                        </td>
+                        {% if request.user.is_authenticated and request.user.is_staff %}
+                            <td class="px-4 py-3 text-center">
+                                <a href="{% url "accounts:student_attendance_update" record.pk%}" class="text-blue-600 hover:text-blue-800 font-semibold text-sm">Edit</a>
+                            </td>
+                        {% endif %}
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="{% if request.user.is_authenticated and request.user.is_staff %}5{% else %}3{% endif %}" class="text-center py-6 text-gray-400">
+                            No attendance records found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
 
-        <!-- Attendance Percentage -->
-        <div class="bg-white rounded-xl shadow-md p-6">
-            <h2 class="text-gray-500 text-sm">Attendance %</h2>
-            <p class="text-3xl font-bold text-blue-600 mt-2">{{ attendance_percentage }}%</p>
-        </div>
+            <!-- Mobile Cards -->
+            <div class="md:hidden space-y-4 p-4">
+                {% for record in attendance_records %}
+                <div class="bg-gray-50 rounded-lg p-4 shadow-sm">
+                    <div class="flex justify-between items-center mb-2">
 
+                        {% if request.user.is_authenticated and request.user.is_staff%}
+                        <div class="text-gray-600 text-sm font-semibold">
+                            {{ record.user.first_name }} {{ record.user.last_name }}
+                        </div>
+                        <a href="{% url "accounts:student_attendance_update" record.pk%}" 
+                        class="text-blue-600 hover:text-blue-800 text-sm font-semibold">
+                            Edit
+                        </a>
+                        {% endif %}
+                    </div>
+                    <div class="text-gray-500 text-xs mb-1">Date: {{ record.created_at|date:"M d, Y" }}</div>
+                    <div class="text-gray-500 text-xs mb-1">Subject: {{ record.subject }}</div>
+                    <div>
+                        Status:
+                        {% if record.status == "Present" %}
+                            <span class="px-2 py-1 rounded-full bg-green-100 text-green-700 text-xs">Present</span>
+                        {% elif record.status == "Absent" %}
+                            <span class="px-2 py-1 rounded-full bg-red-100 text-red-700 text-xs">Absent</span>
+                        {% else %}
+                            <span class="px-2 py-1 rounded-full bg-yellow-100 text-yellow-700 text-xs">Late</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-6 text-gray-400">No attendance records found.</div>
+                {% endfor %}
+            </div>
+
+        </div>
     </div>
 {% endif %}
-
-<!-- Attendance Table / Cards -->
-<div class="bg-white rounded-xl shadow-md overflow-hidden">
-
-    <div class="p-4 border-b flex justify-between items-center">
-        <h2 class="text-lg font-semibold text-gray-700">Attendance Records</h2>
-        {% if request.user.is_authenticated and request.user.is_staff%}
-            <a href="{% url 'accounts:student_add_attendance' %}" 
-            class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
-                + Mark Attendance
-            </a>
-        {% endif %}
-    </div>
-
-    <div class="overflow-x-auto">
-        <!-- Desktop Table -->
-        <table class="table-fixed min-w-full divide-y divide-gray-200 hidden md:table">
-            <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
-                <tr>
-                    <th class="w-1/5 px-4 py-3 text-center">Date</th>
-                    {% if request.user.is_authenticated and request.user.is_staff %}
-                        <th class="w-1/5 px-4 py-3 text-center">Student</th>
-                    {% endif %}
-                    <th class="w-1/5 px-4 py-3 text-center">Subject</th>
-                    <th class="w-1/5 px-4 py-3 text-center">Status</th>
-                    <th class="w-1/5 px-4 py-3 text-center">Total Classes</th>
-                    {% if request.user.is_authenticated and request.user.is_staff %}
-                        <th class="w-1/5 px-4 py-3 text-center">Actions</th>
-                    {% endif %}
-                </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-                {% for record in attendance_records %}
-                <tr class="hover:bg-gray-50 transition">
-                    <!-- Center all cells -->
-                    <td class="px-4 py-3 text-center">{{ record.created_at|date:"M d, Y" }}</td>
-                    {% if request.user.is_authenticated and request.user.is_staff %}
-                        <td class="px-4 py-3 text-center">{{ record.user.first_name }} {{ record.user.last_name }}</td>
-                    {% endif %}
-                    <td class="px-4 py-3 text-center">{{ record.subject }}</td>
-                    <td class="px-4 py-3 text-center">
-                        {% if record.status == "Present" %}
-                            <span class="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs">Present</span>
-                        {% elif record.status == "Absent" %}
-                            <span class="px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs">Absent</span>
-                        {% else %}
-                            <span class="px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 text-xs">Late</span>
-                        {% endif %}
-                    </td>
-                    <td class="px-4 py-3 text-center">
-                        {{ record.user.total_classes_count }}
-                    </td>
-                    {% if request.user.is_authenticated and request.user.is_staff %}
-                        <td class="px-4 py-3 text-center">
-                            <a href="{% url "accounts:student_attendance_update" record.pk%}" class="text-blue-600 hover:text-blue-800 font-semibold text-sm">Edit</a>
-                        </td>
-                    {% endif %}
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="{% if request.user.is_authenticated and request.user.is_staff %}5{% else %}3{% endif %}" class="text-center py-6 text-gray-400">
-                        No attendance records found.
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
-        <!-- Mobile Cards -->
-        <div class="md:hidden space-y-4 p-4">
-            {% for record in attendance_records %}
-            <div class="bg-gray-50 rounded-lg p-4 shadow-sm">
-                <div class="flex justify-between items-center mb-2">
-
-                    {% if request.user.is_authenticated and request.user.is_staff%}
-                    <div class="text-gray-600 text-sm font-semibold">
-                        {{ record.user.first_name }} {{ record.user.last_name }}
-                    </div>
-                    <a href="{% url "accounts:student_attendance_update" record.pk%}" 
-                    class="text-blue-600 hover:text-blue-800 text-sm font-semibold">
-                        Edit
-                    </a>
-                    {% endif %}
-                </div>
-                <div class="text-gray-500 text-xs mb-1">Date: {{ record.created_at|date:"M d, Y" }}</div>
-                <div class="text-gray-500 text-xs mb-1">Subject: {{ record.subject }}</div>
-                <div>
-                    Status:
-                    {% if record.status == "Present" %}
-                        <span class="px-2 py-1 rounded-full bg-green-100 text-green-700 text-xs">Present</span>
-                    {% elif record.status == "Absent" %}
-                        <span class="px-2 py-1 rounded-full bg-red-100 text-red-700 text-xs">Absent</span>
-                    {% else %}
-                        <span class="px-2 py-1 rounded-full bg-yellow-100 text-yellow-700 text-xs">Late</span>
-                    {% endif %}
-                </div>
-            </div>
-            {% empty %}
-            <div class="text-center py-6 text-gray-400">No attendance records found.</div>
-            {% endfor %}
-        </div>
-
-    </div>
-</div>
 
 {% endblock %}

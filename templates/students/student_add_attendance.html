@@ -2,88 +2,88 @@
 {% load tailwind_filters %}
 
 {% block content %}
+{% if request.user.role == 'Admin' or request.user.role == 'Manager' or request.user.role == 'Teacher' %}
+    <div class="max-w-4xl mx-auto my-10">
 
-<div class="max-w-4xl mx-auto my-10">
+        <!-- Selection Card -->
+        <div class="bg-white shadow-lg rounded-xl p-6 mb-8">
+            <h2 class="text-2xl font-semibold mb-4 text-gray-700">
+                Select Class & Subject
+            </h2>
 
-    <!-- Selection Card -->
-    <div class="bg-white shadow-lg rounded-xl p-6 mb-8">
-        <h2 class="text-2xl font-semibold mb-4 text-gray-700">
-            Select Class & Subject
-        </h2>
+            <form method="get" class="space-y-4">
+                {{ form|crispy }}
 
-        <form method="get" class="space-y-4">
-            {{ form|crispy }}
-
-            <button type="submit"
-                class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition duration-200">
-                Load Students
-            </button>
-        </form>
-    </div>
-
-
-    {% if students %}
-
-    <!-- Attendance Sheet Card -->
-    <div class="bg-white shadow-lg rounded-xl p-6">
-        <h2 class="text-2xl font-semibold mb-6 text-gray-700">
-            Attendance Sheet
-        </h2>
-
-        <form method="post">
-            {% csrf_token %}
-
-            <!-- Hidden Form Fields -->
-            <input type="hidden" name="class_name" value="{{ form.class_name.value }}">
-            <input type="hidden" name="subject" value="{{ form.subject.value }}">
-
-            <div class="overflow-x-auto">
-                <table class="min-w-full border border-gray-200 rounded-lg">
-                    <thead class="bg-gray-100">
-                        <tr>
-                            <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">
-                                Roll
-                            </th>
-                            <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">
-                                Attendance Status
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200">
-
-                        {% for student in students %}
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-4 py-3 font-medium text-gray-700">
-                                {{ student.roll }}
-                            </td>
-
-                            <td class="px-4 py-3">
-                                <select name="status_{{ student.id }}"
-                                    class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                    <option value="Present">Present</option>
-                                    <option value="Absent">Absent</option>
-                                    <option value="Late">Late</option>
-                                </select>
-                            </td>
-                        </tr>
-                        {% endfor %}
-
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="mt-6">
                 <button type="submit"
-                    class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition duration-200">
-                    Save Attendance
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition duration-200">
+                    Load Students
                 </button>
-            </div>
+            </form>
+        </div>
 
-        </form>
+
+        {% if students %}
+
+        <!-- Attendance Sheet Card -->
+        <div class="bg-white shadow-lg rounded-xl p-6">
+            <h2 class="text-2xl font-semibold mb-6 text-gray-700">
+                Attendance Sheet
+            </h2>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <!-- Hidden Form Fields -->
+                <input type="hidden" name="class_name" value="{{ form.class_name.value }}">
+                <input type="hidden" name="subject" value="{{ form.subject.value }}">
+
+                <div class="overflow-x-auto">
+                    <table class="min-w-full border border-gray-200 rounded-lg">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                                    Roll
+                                </th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                                    Attendance Status
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+
+                            {% for student in students %}
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-3 font-medium text-gray-700">
+                                    {{ student.roll }}
+                                </td>
+
+                                <td class="px-4 py-3">
+                                    <select name="status_{{ student.id }}"
+                                        class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                        <option value="Present">Present</option>
+                                        <option value="Absent">Absent</option>
+                                        <option value="Late">Late</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            {% endfor %}
+
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-6">
+                    <button type="submit"
+                        class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition duration-200">
+                        Save Attendance
+                    </button>
+                </div>
+
+            </form>
+        </div>
+
+        {% endif %}
+
     </div>
-
-    {% endif %}
-
-</div>
-
+{% endif %}
 {% endblock content %}

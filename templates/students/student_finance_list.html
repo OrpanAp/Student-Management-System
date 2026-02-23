@@ -1,134 +1,136 @@
 {% extends "base/main.html" %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto py-8 px-4">
+{% if not request.user.role == 'Teacher' %}
+    <div class="max-w-4xl mx-auto py-8 px-4">
 
-    <!-- Page Header -->
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-        <h1 class="text-3xl font-bold text-gray-800">Financial Summary</h1>
-        {% if request.user.is_authenticated and request.user.is_staff %}
-            <a href="{% url 'accounts:student_add_finacials' %}" 
-            class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-            Add Finacial Track
-            </a>
-        {% endif %}
-    </div>
+        <!-- Page Header -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+            <h1 class="text-3xl font-bold text-gray-800">Financial Summary</h1>
+            {% if request.user.is_authenticated and request.user.is_staff %}
+                <a href="{% url 'accounts:student_add_finacials' %}" 
+                class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                Add Finacial Track
+                </a>
+            {% endif %}
+        </div>
 
-    {% if summaries %}
-    
-    <!-- Desktop Table -->
-    <div class="hidden md:block bg-white rounded-xl shadow overflow-hidden">
-        <table class="min-w-full border-collapse text-sm">
-            <thead class="bg-gray-100">
-                <tr>
-                    <th class="p-3 border text-left">#</th>
-                    {% if request.user.is_authenticated and request.user.is_staff %}
-                        <th class="p-3 border text-left">Name</th>
-                        <th class="p-3 border text-left">Roll</th>
-                    {% endif %}
-                    <th class="p-3 border text-left">Semester</th>
-                    <th class="p-3 border text-left">Year</th>
-                    <th class="p-3 border text-left">Total</th>
-                    <th class="p-3 border text-left">Status</th>
-                    {% if request.user.is_authenticated and request.user.is_staff %}
-                        <th class="p-3 border text-center">Actions</th>
-                    {% endif %}
-                </tr>
-            </thead>
-            <tbody>
-                {% for summary in summaries %}
-                <tr class="hover:bg-gray-50">
-                    <td class="p-3 border">{{ forloop.counter }}</td>
-                    {% if request.user.is_authenticated and request.user.is_staff %}
-                        <td class="p-3 border">{{ summary.user.first_name }} {{summary.user.last_name}}</td>
-                        <td class="p-3 border">{{ summary.roll|default:"-" }}</td>
-                    {% endif %}
-                    <td class="p-3 border">{{ summary.semester|default:"-" }}</td>
-                    <td class="p-3 border">{{ summary.year|default:"-" }}</td>
-                    <td class="p-3 border">{{ summary.total|default_if_none:"-" }}</td>
-                    <td class="p-3 border">
-                        {% if summary.paid == "Paid" %}
-                            <span class="px-2 py-1 rounded-full bg-green-100 text-green-700 text-xs">Paid</span>
-                        {% else %}
-                            <span class="px-2 py-1 rounded-full bg-red-100 text-red-700 text-xs">Unpaid</span>
+        {% if summaries %}
+        
+        <!-- Desktop Table -->
+        <div class="hidden md:block bg-white rounded-xl shadow overflow-hidden">
+            <table class="min-w-full border-collapse text-sm">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="p-3 border text-left">#</th>
+                        {% if request.user.is_authenticated and request.user.is_staff %}
+                            <th class="p-3 border text-left">Name</th>
+                            <th class="p-3 border text-left">Roll</th>
                         {% endif %}
-                    </td>
-                    {% if request.user.is_authenticated and request.user.is_staff %}
-                        <td class="p-3 border text-center">
-                            <a href="{% url "accounts:student_update_finacials" summary.pk %}" 
-                                class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs">
-                                Edit
-                            </a>
+                        <th class="p-3 border text-left">Semester</th>
+                        <th class="p-3 border text-left">Year</th>
+                        <th class="p-3 border text-left">Total</th>
+                        <th class="p-3 border text-left">Status</th>
+                        {% if request.user.is_authenticated and request.user.is_staff %}
+                            <th class="p-3 border text-center">Actions</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for summary in summaries %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-3 border">{{ forloop.counter }}</td>
+                        {% if request.user.is_authenticated and request.user.is_staff %}
+                            <td class="p-3 border">{{ summary.user.first_name }} {{summary.user.last_name}}</td>
+                            <td class="p-3 border">{{ summary.roll|default:"-" }}</td>
+                        {% endif %}
+                        <td class="p-3 border">{{ summary.semester|default:"-" }}</td>
+                        <td class="p-3 border">{{ summary.year|default:"-" }}</td>
+                        <td class="p-3 border">{{ summary.total|default_if_none:"-" }}</td>
+                        <td class="p-3 border">
+                            {% if summary.paid == "Paid" %}
+                                <span class="px-2 py-1 rounded-full bg-green-100 text-green-700 text-xs">Paid</span>
+                            {% else %}
+                                <span class="px-2 py-1 rounded-full bg-red-100 text-red-700 text-xs">Unpaid</span>
+                            {% endif %}
                         </td>
-                    {% endif %}
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+                        {% if request.user.is_authenticated and request.user.is_staff %}
+                            <td class="p-3 border text-center">
+                                <a href="{% url "accounts:student_update_finacials" summary.pk %}" 
+                                    class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs">
+                                    Edit
+                                </a>
+                            </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
-    <!-- Mobile Cards -->
-    <div class="md:hidden space-y-4">
-            {% for summary in summaries %}
-            <div class="bg-white p-5 rounded-lg shadow">
+        <!-- Mobile Cards -->
+        <div class="md:hidden space-y-4">
+                {% for summary in summaries %}
+                <div class="bg-white p-5 rounded-lg shadow">
 
-                {% if request.user.is_authenticated and request.user.is_staff %}
-                    <!-- Name -->
-                    <div class="mb-3">
-                        <h3 class="text-lg font-semibold">{{ summary.user.first_name }} {{ summary.user.last_name }}</h3>
-                    </div>
-                {% endif %}
-
-                <!-- Info rows -->
-                <div class="space-y-2 text-sm">
                     {% if request.user.is_authenticated and request.user.is_staff %}
-                        <div class="flex flex-col sm:flex-row sm:justify-between break-words">
-                            <span class="font-medium text-gray-600">Roll</span>
-                            <span class="truncate sm:ml-2">{{ summary.roll }}</span>
+                        <!-- Name -->
+                        <div class="mb-3">
+                            <h3 class="text-lg font-semibold">{{ summary.user.first_name }} {{ summary.user.last_name }}</h3>
                         </div>
                     {% endif %}
-                    
-                    <div class="flex flex-col sm:flex-row sm:justify-between">
-                        <span class="font-medium text-gray-600">Semester</span>
-                        <span class="sm:ml-2">{{ summary.semester|default:"-" }}</span>
-                    </div>
-                    
-                    <div class="flex flex-col sm:flex-row sm:justify-between">
-                        <span class="font-medium text-gray-600">Year</span>
-                        <span class="sm:ml-2">{{ summary.year|default:"-" }}</span>
-                    </div>
-                    
-                    <div class="flex flex-col sm:flex-row sm:justify-between">
-                        <span class="font-medium text-gray-600">Total</span>
-                        <span class="sm:ml-2">{{ summary.total|default_if_none:"-" }}</span>
-                    </div>
 
-                    <div class="flex flex-col sm:flex-row sm:justify-between">
-                        <span class="font-medium text-gray-600">Status</span>
-                        {% if summary.paid == "Paid" %}
-                            <span class="px-2 py-1 rounded-full bg-green-100 text-green-700 text-xs">Paid</span>
-                        {% else %}
-                            <span class="px-2 py-1 rounded-full bg-red-100 text-red-700 text-xs">Unpaid</span>
+                    <!-- Info rows -->
+                    <div class="space-y-2 text-sm">
+                        {% if request.user.is_authenticated and request.user.is_staff %}
+                            <div class="flex flex-col sm:flex-row sm:justify-between break-words">
+                                <span class="font-medium text-gray-600">Roll</span>
+                                <span class="truncate sm:ml-2">{{ summary.roll }}</span>
+                            </div>
                         {% endif %}
                         
-                    </div>
+                        <div class="flex flex-col sm:flex-row sm:justify-between">
+                            <span class="font-medium text-gray-600">Semester</span>
+                            <span class="sm:ml-2">{{ summary.semester|default:"-" }}</span>
+                        </div>
+                        
+                        <div class="flex flex-col sm:flex-row sm:justify-between">
+                            <span class="font-medium text-gray-600">Year</span>
+                            <span class="sm:ml-2">{{ summary.year|default:"-" }}</span>
+                        </div>
+                        
+                        <div class="flex flex-col sm:flex-row sm:justify-between">
+                            <span class="font-medium text-gray-600">Total</span>
+                            <span class="sm:ml-2">{{ summary.total|default_if_none:"-" }}</span>
+                        </div>
 
+                        <div class="flex flex-col sm:flex-row sm:justify-between">
+                            <span class="font-medium text-gray-600">Status</span>
+                            {% if summary.paid == "Paid" %}
+                                <span class="px-2 py-1 rounded-full bg-green-100 text-green-700 text-xs">Paid</span>
+                            {% else %}
+                                <span class="px-2 py-1 rounded-full bg-red-100 text-red-700 text-xs">Unpaid</span>
+                            {% endif %}
+                            
+                        </div>
+
+                    </div>
+                    {% if request.user.is_authenticated and request.user.is_staff %}
+                        <!-- Actions -->
+                        <div class="mt-4 flex gap-4 justify-end text-sm">
+                            <a href="{% url "accounts:student_update_finacials" summary.pk %}" class="text-green-600 hover:underline">Edit</a>
+                        </div>
+                    {% endif %}
                 </div>
-                {% if request.user.is_authenticated and request.user.is_staff %}
-                    <!-- Actions -->
-                    <div class="mt-4 flex gap-4 justify-end text-sm">
-                        <a href="{% url "accounts:student_update_finacials" summary.pk %}" class="text-green-600 hover:underline">Edit</a>
-                    </div>
-                {% endif %}
-            </div>
-        {% endfor %}
-    </div>
-
-    {% else %}
-        <div class="text-center text-gray-500 text-lg py-10">
-            No subjects found.
+            {% endfor %}
         </div>
-    {% endif %}
 
-</div>
+        {% else %}
+            <div class="text-center text-gray-500 text-lg py-10">
+                No subjects found.
+            </div>
+        {% endif %}
+
+    </div>
+{% endif %}
 {% endblock %}

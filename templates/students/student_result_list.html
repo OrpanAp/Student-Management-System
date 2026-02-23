@@ -1,166 +1,167 @@
 {% extends "base/main.html" %}
 
 {% block content %}
-
-<!-- Header -->
-<section class="bg-blue-600 text-white py-12">
-    <div class="max-w-7xl mx-auto px-6">
-        <h2 class="text-3xl font-bold">Student Results</h2>
-        <p class="mt-2">View and manage all registered student</p>
-    </div>
-</section>
-
-<!-- Content -->
-<section class="py-12 bg-gray-50">
-    <div class="max-w-7xl mx-auto px-6">
-
-        {% if request.user.is_authenticated and request.user.is_staff %}
-            <!-- Top Controls: Search + Class Filter + Add -->
-            <form method="get" class="mb-6 flex gap-4">
-
-                <select name="year" onchange="this.form.submit()">
-                    <option value="">All Years</option>
-                    {% for y in years %}
-                        <option value="{{ y }}" {% if selected_year == y %}selected{% endif %}>
-                            {{ y }}
-                        </option>
-                    {% endfor %}
-                </select>
-
-                <select name="semester" onchange="this.form.submit()">
-                    <option value="">All Semesters</option>
-                    {% for s in semesters %}
-                        <option value="{{ s }}" {% if selected_semester == s %}selected{% endif %}>
-                            {{ s }}
-                        </option>
-                    {% endfor %}
-                </select>
-
-                <select name="class" onchange="this.form.submit()">
-                    <option value="">All Classes</option>
-                    {% for c in classes %}
-                        <option value="{{ c }}" {% if selected_class == c %}selected{% endif %}>
-                            {{ c }}
-                        </option>
-                    {% endfor %}
-                </select>
-
-                <!-- Add Student Button -->
-                <a href="{% url "accounts:student_add_result" %}" 
-                    class="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 text-center">
-                    + Add Result
-                </a>
-                
-            </form>
-        {% endif %}
-
-        <!-- Desktop Table -->
-        <div class=" bg-white shadow rounded-lg overflow-x-auto">
-            {% for year, semesters in grouped_results.items %}
-                <div class="mb-10">
-
-                    <h1 class="text-2xl font-bold mb-4">
-                        Academic Year {{ year }}
-                    </h1>
-
-                    {% for semester, results in semesters.items %}
-                        <div class="mb-6 p-5 border rounded-lg shadow">
-
-                            <h2 class="text-xl font-semibold mb-3">
-                                {{ semester }} Semester
-                            </h2>
-
-                            <p>
-                                <strong>Class:</strong>
-                                {{ results.0.user.studentprofile.class_list }}
-                            </p>
-
-                            <table class="w-full mt-3 border">
-                                <tr class="bg-gray-100">
-                                    <th class="p-2 border">Subject</th>
-                                    <th class="p-2 border">CGPA</th>
-                                </tr>
-
-                                {% for result in results %}
-                                    <tr>
-                                        <td class="p-2 border">{{ result.subject }}</td>
-                                        <td class="p-2 border text-center">{{ result.cgpa }}</td>
-                                    </tr>
-                                {% endfor %}
-                            </table>
-
-                        </div>
-                    {% endfor %}
-
-                </div>
-            {% endfor %}
+{% if not request.user.role == 'Accounts' %}
+    <!-- Header -->
+    <section class="bg-blue-600 text-white py-12">
+        <div class="max-w-7xl mx-auto px-6">
+            <h2 class="text-3xl font-bold">Student Results</h2>
+            <p class="mt-2">View and manage all registered student</p>
         </div>
+    </section>
 
-        <!-- Mobile Cards -->
-        <div class="lg:hidden space-y-4">
-            {% for result in results %}
-            <div class="bg-white p-5 rounded-lg shadow">
+    <!-- Content -->
+    <section class="py-12 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-6">
 
-                <!-- Name -->
-                <div class="mb-3">
-                    <h3 class="text-lg font-semibold">{{ result.user.first_name }} {{ result.user.last_name }}</h3>
-                </div>
+            {% if request.user.is_authenticated and request.user.is_staff %}
+                <!-- Top Controls: Search + Class Filter + Add -->
+                <form method="get" class="mb-6 flex gap-4">
 
-                <!-- Info rows -->
-                <div class="space-y-2 text-sm">
+                    <select name="year" onchange="this.form.submit()">
+                        <option value="">All Years</option>
+                        {% for y in years %}
+                            <option value="{{ y }}" {% if selected_year == y %}selected{% endif %}>
+                                {{ y }}
+                            </option>
+                        {% endfor %}
+                    </select>
+
+                    <select name="semester" onchange="this.form.submit()">
+                        <option value="">All Semesters</option>
+                        {% for s in semesters %}
+                            <option value="{{ s }}" {% if selected_semester == s %}selected{% endif %}>
+                                {{ s }}
+                            </option>
+                        {% endfor %}
+                    </select>
+
+                    <select name="class" onchange="this.form.submit()">
+                        <option value="">All Classes</option>
+                        {% for c in classes %}
+                            <option value="{{ c }}" {% if selected_class == c %}selected{% endif %}>
+                                {{ c }}
+                            </option>
+                        {% endfor %}
+                    </select>
+
+                    <!-- Add Student Button -->
+                    <a href="{% url "accounts:student_add_result" %}" 
+                        class="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 text-center">
+                        + Add Result
+                    </a>
+                    
+                </form>
+            {% endif %}
+
+            <!-- Desktop Table -->
+            <div class=" bg-white shadow rounded-lg overflow-x-auto">
+                {% for year, semesters in grouped_results.items %}
+                    <div class="mb-10">
+
+                        <h1 class="text-2xl font-bold mb-4">
+                            Academic Year {{ year }}
+                        </h1>
+
+                        {% for semester, results in semesters.items %}
+                            <div class="mb-6 p-5 border rounded-lg shadow">
+
+                                <h2 class="text-xl font-semibold mb-3">
+                                    {{ semester }} Semester
+                                </h2>
+
+                                <p>
+                                    <strong>Class:</strong>
+                                    {{ results.0.user.studentprofile.class_list }}
+                                </p>
+
+                                <table class="w-full mt-3 border">
+                                    <tr class="bg-gray-100">
+                                        <th class="p-2 border">Subject</th>
+                                        <th class="p-2 border">CGPA</th>
+                                    </tr>
+
+                                    {% for result in results %}
+                                        <tr>
+                                            <td class="p-2 border">{{ result.subject }}</td>
+                                            <td class="p-2 border text-center">{{ result.cgpa }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </table>
+
+                            </div>
+                        {% endfor %}
+
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Mobile Cards -->
+            <div class="lg:hidden space-y-4">
+                {% for result in results %}
+                <div class="bg-white p-5 rounded-lg shadow">
+
+                    <!-- Name -->
+                    <div class="mb-3">
+                        <h3 class="text-lg font-semibold">{{ result.user.first_name }} {{ result.user.last_name }}</h3>
+                    </div>
+
+                    <!-- Info rows -->
+                    <div class="space-y-2 text-sm">
+                        {% if request.user.is_staff %}
+                            <div class="flex flex-col sm:flex-row sm:justify-between break-words">
+                                <span class="font-medium text-gray-600">Email</span>
+                                <span class="sm:ml-2">{{ result.user.email|default:"-" }}</span>
+                            </div>
+
+                            <div class="flex flex-col sm:flex-row sm:justify-between">
+                                <span class="font-medium text-gray-600">Class</span>
+                                <span class="sm:ml-2">{{ result.user.studentprofile.class_list|default:"-" }}</span>
+                            </div>
+                            
+                            <div class="flex flex-col sm:flex-row sm:justify-between">
+                                <span class="font-medium text-gray-600">Roll</span>
+                                <span class="sm:ml-2">{{ result.user.studentprofile.roll|default:"-" }}</span>
+                            </div>
+                        {% endif %}
+                            <div class="flex flex-col sm:flex-row sm:justify-between">
+                                <span class="font-medium text-gray-600">Subject</span>
+                                <span class="sm:ml-2">{{ result.subject|default:"-" }}</span>
+                            </div>
+                            
+                            <div class="flex flex-col sm:flex-row sm:justify-between">
+                                <span class="font-medium text-gray-600">Semister</span>
+                                <span class="sm:ml-2">{{ result.semester|default:"-" }}</span>
+                            </div>
+                            
+                            <div class="flex flex-col sm:flex-row sm:justify-between">
+                                <span class="font-medium text-gray-600">Year</span>
+                                <span class="sm:ml-2">{{ result.year|default:"-" }}</span>
+                            </div>
+
+                            <div class="flex flex-col sm:flex-row sm:justify-between">
+                                <span class="font-medium text-gray-600">CGPA</span>
+                                <span class="sm:ml-2">{{ student.cgpa|default:"-" }}</span>
+                            </div>
+                        </div>
+                    
                     {% if request.user.is_staff %}
-                        <div class="flex flex-col sm:flex-row sm:justify-between break-words">
-                            <span class="font-medium text-gray-600">Email</span>
-                            <span class="sm:ml-2">{{ result.user.email|default:"-" }}</span>
-                        </div>
-
-                        <div class="flex flex-col sm:flex-row sm:justify-between">
-                            <span class="font-medium text-gray-600">Class</span>
-                            <span class="sm:ml-2">{{ result.user.studentprofile.class_list|default:"-" }}</span>
-                        </div>
-                        
-                        <div class="flex flex-col sm:flex-row sm:justify-between">
-                            <span class="font-medium text-gray-600">Roll</span>
-                            <span class="sm:ml-2">{{ result.user.studentprofile.roll|default:"-" }}</span>
+                        <!-- Actions -->
+                        <div class="mt-4 flex gap-4 justify-end text-sm">
+                            <a href="" class="text-blue-600 hover:underline">View</a>
+                            <a href="" class="text-green-600 hover:underline">Edit</a>
+                            <a href="#" class="text-red-600 hover:underline">Delete</a>
                         </div>
                     {% endif %}
-                        <div class="flex flex-col sm:flex-row sm:justify-between">
-                            <span class="font-medium text-gray-600">Subject</span>
-                            <span class="sm:ml-2">{{ result.subject|default:"-" }}</span>
-                        </div>
-                        
-                        <div class="flex flex-col sm:flex-row sm:justify-between">
-                            <span class="font-medium text-gray-600">Semister</span>
-                            <span class="sm:ml-2">{{ result.semester|default:"-" }}</span>
-                        </div>
-                        
-                        <div class="flex flex-col sm:flex-row sm:justify-between">
-                            <span class="font-medium text-gray-600">Year</span>
-                            <span class="sm:ml-2">{{ result.year|default:"-" }}</span>
-                        </div>
 
-                        <div class="flex flex-col sm:flex-row sm:justify-between">
-                            <span class="font-medium text-gray-600">CGPA</span>
-                            <span class="sm:ml-2">{{ student.cgpa|default:"-" }}</span>
-                        </div>
-                    </div>
-                
-                {% if request.user.is_staff %}
-                    <!-- Actions -->
-                    <div class="mt-4 flex gap-4 justify-end text-sm">
-                        <a href="" class="text-blue-600 hover:underline">View</a>
-                        <a href="" class="text-green-600 hover:underline">Edit</a>
-                        <a href="#" class="text-red-600 hover:underline">Delete</a>
-                    </div>
-                {% endif %}
-
+                </div>
+                {% empty %}
+                <div class="text-center p-4 text-gray-500">No results found.</div>
+                {% endfor %}
             </div>
-            {% empty %}
-            <div class="text-center p-4 text-gray-500">No results found.</div>
-            {% endfor %}
+
         </div>
+    </section>
 
-    </div>
-</section>
-
+{% endif %}
 {% endblock content %}

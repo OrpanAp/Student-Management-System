@@ -42,4 +42,6 @@ urlpatterns = [
     path("stuffs/finacial/student_add_finacials/", views.StudentAddFinacialView.as_view(), name="student_add_finacials"),
     path("stuffs/finacial/student_finance_list/", views.StudentFinanceListView.as_view(), name="student_finance_list"),
     path("stuffs/finacial/student_update_finacials/<int:pk>/", views.StudentAddFinacialUpdateView.as_view(), name="student_update_finacials"),
+    
+    path("stuffs/manage_group_permissions/", views.GroupPermissionView.as_view(), name="manage_group_permissions"),
 ]

@@ -45,18 +45,32 @@
                         <p>Generate reports and view performance.</p>
                     </a>
 
-                    {% if request.user.is_staff %}
+                    {% if request.user.role == 'Admin' or request.user.role == 'Manager' or request.user.role == 'Teacher' %}
                     
-                    <!-- Card -->
-                    <a href="{% url 'accounts:subject_list' %}" 
-                    class="bg-white p-8 rounded-xl shadow text-center 
-                    hover:shadow-xl hover:-translate-y-2 
-                    transition transform duration-300 
-                    cursor-pointer block">
+                        <!-- Card -->
+                        <a href="{% url 'accounts:subject_list' %}" 
+                        class="bg-white p-8 rounded-xl shadow text-center 
+                        hover:shadow-xl hover:-translate-y-2 
+                        transition transform duration-300 
+                        cursor-pointer block">
+                        
+                            <h4 class="text-xl font-semibold mb-3">Subjects</h4>
+                            <p>Create subjects and modify them.</p>
+                        </a>
+                    {% endif %}
                     
-                        <h4 class="text-xl font-semibold mb-3">Subjects</h4>
-                        <p>Create subjects and modify them.</p>
-                    </a>
+
+                    {% if request.user.role == 'Admin' or request.user.role == 'Manager' %}
+                        <!-- Card -->
+                        <a href="{% url 'accounts:manage_group_permissions' %}" 
+                        class="bg-white p-8 rounded-xl shadow text-center 
+                        hover:shadow-xl hover:-translate-y-2 
+                        transition transform duration-300 
+                        cursor-pointer block">
+                        
+                            <h4 class="text-xl font-semibold mb-3">Permissions</h4>
+                            <p>Create Permissions and modify them.</p>
+                        </a>
                     {% endif %}
 
                     <!-- Card -->

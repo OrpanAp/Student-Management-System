@@ -1,6 +1,8 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from . import models
+from django.contrib.admin.widgets import FilteredSelectMultiple
+from django.contrib.auth.models import Group, Permission
 
 
 class UserCreateForm(UserCreationForm):
@@ -126,3 +128,23 @@ class StudentFinacial(forms.ModelForm):
             'year',
             'paid'
         )
+
+
+
+class GroupPermissionForm(forms.Form):
+    group = forms.ModelChoiceField(queryset=Group.objects.all(), required=True)
+    permissions = forms.ModelMultipleChoiceField(
+        queryset=Permission.objects.all(),
+        required=False,
+        widget=FilteredSelectMultiple(
+            verbose_name="Permissions",
+            is_stacked=False,
+            attrs={'size': '20'}  # Number of visible rows
+        )
+    )
+
+    def __init__(self, *args, **kwargs):
+        selected_group = kwargs.pop('group_instance', None)
+        super().__init__(*args, **kwargs)
+        if selected_group:
+            self.fields['permissions'].initial = selected_group.permissions.all()
